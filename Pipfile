@@ -1,0 +1,20 @@
+[packages]
+fastapi = "*"
+uvicorn = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+python-dotenv = "*"
+celery = "*"
+redis = "*"
+pydantic = "*"
+alembic = "*"
+pydantic-settings = "*"
+
+
+[dev-packages]
+black = "*"
+isort = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.10"

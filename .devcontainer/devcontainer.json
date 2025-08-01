@@ -1,0 +1,20 @@
+{
+    "name": "FastAPI Dev",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "service": "dev",
+    "workspaceFolder": "/code",
+    "runServices": [
+        "db",
+        "redis"
+    ],
+    "postStartCommand": "bash .devcontainer/start-dev.sh",
+    "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+    },
+    "forwardPorts": [
+        8000
+    ],
+    "remoteUser": "root"
+}
