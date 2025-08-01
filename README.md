@@ -1,93 +1,189 @@
-# Intelligent Stock Market Monitoring Platform - Backend
+# 🚀 Real-Time & Intelligent Stock Market Monitoring Platform
 
+A production-ready, developer-friendly template for building robust FastAPI backends.
 
+---
 
-## Getting started
+## 🔧 Features
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- **FastAPI** – Python async web API
+- **PostgreSQL** – Primary relational database
+- **SQLAlchemy 2.0** – ORM with full Pydantic support
+- **Alembic** – Database migrations
+- **Celery + Redis** – Async task queue system
+- **Docker + Docker Compose** – Containerized dev environment
+- **Pipenv + requirements.txt** – Dual support for Python dependencies
+- **Devcontainer for VS Code** – One-click development setup
+- **Modular project structure** – Clean, API-first layout
+- **`.env` config loading** – via `pydantic-settings`
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+---
 
-## Add your files
+## 🗂️ Project Structure
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
+```text
+.
+├── app/
+│   ├── api/            # API routes
+│   ├── core/           # Config, Celery, constants
+│   ├── db/             # SQLAlchemy models, Base, session
+│   ├── services/       # Business logic, Celery tasks
+│   └── main.py         # App entrypoint
+├── alembic/            # Alembic migrations
+├── .devcontainer/      # VS Code Dev Container setup
+├── docker-compose.yml  # Docker service definitions
+├── Dockerfile          # Base Docker image
+├── Pipfile             # Python dependencies
+├── requirements.txt    # Exported from Pipfile
+├── .env                # Environment variables
+└── README.md
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/secncy_management-group/intelligent-stock-market-monitoring-platform-backend.git
-git branch -M main
-git push -uf origin main
+
+---
+
+## ⚙️ Getting Started
+
+### 1️⃣ Prerequisites
+
+Install the following:
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [VS Code](https://code.visualstudio.com/)
+- [Dev Containers Extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+---
+
+### 2️⃣ Start with Dev Container (Recommended)
+
+1. **Clone the repo:**
+
+    ```bash
+    git clone https://gitlab.com/secncy_management-group/intelligent-stock-market-monitoring-platform-backend
+    ```
+
+2. **Open with VS Code**  
+   When prompted:  
+   👉 “Reopen in Container” → Click it.
+
+The devcontainer will:
+
+- Start PostgreSQL & Redis
+- Run FastAPI on port 8000
+- Start Celery worker
+- Mount your code with live reload
+
+**Visit your API:**
+
+- [http://localhost:8000](http://localhost:8000)
+- Swagger docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+---
+
+### 3️⃣ Working with Alembic
+
+**Create a new migration:**
+
+```bash
+alembic revision --autogenerate -m "add users table"
 ```
 
-## Integrate with your tools
+**Apply migrations:**
 
-- [ ] [Set up project integrations](https://gitlab.com/secncy_management-group/intelligent-stock-market-monitoring-platform-backend/-/settings/integrations)
+```bash
+alembic upgrade head
+```
 
-## Collaborate with your team
+---
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### 4️⃣ Running Celery Tasks
 
-## Test and Deploy
+In your code:
 
-Use the built-in continuous integration in GitLab.
+```python
+from app.core.celery_app import test_task
+test_task.delay(2, 3)
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Logs will show in the Celery worker terminal.
 
-***
+---
 
-# Editing this README
+## 📚 Learning Resources
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+- [FastAPI Docs](https://fastapi.tiangolo.com/)
+- [FastAPI SQL Databases](https://fastapi.tiangolo.com/tutorial/sql-databases/)
+- [SQLAlchemy Docs](https://docs.sqlalchemy.org/en/20/)
+- [SQLAlchemy ORM Quickstart](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
+- [Celery Docs](https://docs.celeryq.dev/en/stable/)
+- [FastAPI + Celery Guide](https://testdriven.io/blog/fastapi-celery/)
+- [Docker Curriculum](https://docker-curriculum.com/)
+- [Docker Compose Docs](https://docs.docker.com/compose/)
+- [Pydantic v2 Docs](https://docs.pydantic.dev/latest/)
+- [VS Code Devcontainers](https://code.visualstudio.com/docs/devcontainers/containers)
 
-## Suggestions for a good README
+---
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+## ❓ FAQ
 
-## Name
-Choose a self-explaining name for your project.
+**How do I add new models?**
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+1. Create your model in `app/db/models/`
+2. Import it in `base.py`
+3. Run:
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+    ```bash
+    alembic revision --autogenerate -m "your change"
+    alembic upgrade head
+    ```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+**Where do I add background tasks?**
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- Put Celery tasks in `app/services/tasks.py` or wherever makes sense.
+- Register them in `celery_app.py`.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+---
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+**What if ports are already in use?**
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+- Edit `docker-compose.yml` and change:
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+    ```yaml
+    ports:
+      - "8001:8000"  # example: run FastAPI on 8001 instead of 8000
+    ```
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+---
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+**How do I restart services?**
 
-## License
-For open source projects, say how it is licensed.
+From inside the devcontainer terminal:
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```bash
+docker-compose down
+docker-compose up --build
+```
+
+Or simply reopen the container.
+
+---
+
+## 🧼 Developer Tips
+
+- Use `black`, `isort`, and `pytest` for clean code
+- All settings are configured via `.env` and loaded using `pydantic-settings`
+- Logs for Celery show in the terminal that launched it
+- Use `alembic history` to track migration state
+
+---
+
+## ✅ Summary
+
+With this template, you can:
+
+- Write clean async APIs with FastAPI
+- Store data in Postgres using SQLAlchemy ORM
+- Run background jobs with Celery + Redis
+- Manage DB schema using Alembic
+- Work in a fully containerized
