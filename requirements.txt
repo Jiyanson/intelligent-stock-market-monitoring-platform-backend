@@ -38,3 +38,16 @@ tzdata==2025.2; python_version >= '3.9'
 uvicorn==0.35.0
 vine==5.1.0; python_version >= '3.6'
 wcwidth==0.2.13
+httptools==0.6.4
+python-dotenv==1.1.1
+uvloop==0.21.0
+watchfiles==1.1.0
+anyio==4.9.0
+argon2-cffi==23.1.0
+argon2-cffi-bindings==25.1.0
+bcrypt==4.3.0
+dnspython==2.7.0
+email-validator==2.2.0
+fastapi==0.116.1
+fastapi-users==14.0.1
+fastapi-users-db-sqlalchemy==7.0
