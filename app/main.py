@@ -1,60 +1,70 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi_users import FastAPIUsers
-from fastapi_users.authentication.jwt import JWTAuthentication
-from fastapi_users.db.sqlalchemy import SQLAlchemyUserDatabase
-from .db.session import SessionLocal
-from .db.models import User
-from .schemas import UserCreate, UserUpdate
-from .users import fastapi_users, get_user_db
+from fastapi import FastAPI, Depends
+from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.core.fastapi_users import fastapi_users, current_active_user
+from app.core.auth import auth_backend
+from app.db.models.user import User
+from app.api.routes.ping import router as ping_router
 
-app = FastAPI()
+app = FastAPI(
+    title="Stock Market Monitoring Platform",
+    description="A production-ready FastAPI backend with FastAPI Users authentication",
+    version="1.0.0"
+)
 
-# Dependency to get a database session
-async def get_db():
-    async with SessionLocal() as session:
-        yield session
-
-# Define the current_user dependency
-def get_current_user(db: SQLAlchemyUserDatabase = Depends(get_user_db), token: str = Depends(JWTAuthentication(fastapi_users.auth_backends[0]))):
-    return fastapi_users.current_user(token, db)
-
-# Include FastAPI-Users router
+# Include authentication routes
 app.include_router(
-    fastapi_users.get_auth_router(JWTAuthentication),
-    prefix="/auth",
+    fastapi_users.get_auth_router(auth_backend), 
+    prefix="/auth/jwt", 
     tags=["auth"]
 )
 
 app.include_router(
-    fastapi_users.get_register_router(User, UserCreate, UserUpdate),
+    fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
-    tags=["auth"]
+    tags=["auth"],
 )
 
 app.include_router(
-    fastapi_users.get_users_router(User, UserUpdate),
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_verify_router(UserRead),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
-    tags=["users"]
+    tags=["users"],
 )
 
-@app.get("/users/me", response_model=User)
-async def read_users_me(
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    return current_user
+# Include other routes
+app.include_router(ping_router, prefix="/api/v1", tags=["health"])
 
-@app.on_event("startup")
-async def startup_event():
-    # Create tables if they do not exist
-    async with SessionLocal() as session:
-        await Base.metadata.create_all(bind=session.bind)
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to Stock Market Monitoring Platform API with FastAPI Users",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "auth_endpoints": {
+            "register": "/auth/register",
+            "login": "/auth/jwt/login",
+            "logout": "/auth/jwt/logout",
+            "users": "/users/me"
+        }
+    }
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    # No need to manually close the database connection
-    pass
+@app.get("/protected-route")
+async def protected_route(user: User = Depends(current_active_user)):
+    return {
+        "message": f"Hello {user.email}! This is a protected route.",
+        "user_id": str(user.id)
+    }
 
 if __name__ == "__main__":
     import uvicorn
