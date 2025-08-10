@@ -1,3 +1,4 @@
+# app/main.py
 from fastapi import FastAPI, Depends
 from app.schemas.user import UserCreate, UserRead, UserUpdate
 from app.core.fastapi_users import fastapi_users, current_active_user
@@ -63,9 +64,19 @@ async def root():
 async def protected_route(user: User = Depends(current_active_user)):
     return {
         "message": f"Hello {user.email}! This is a protected route.",
-        "user_id": str(user.id)
+        "user_id": str(user.id),
+        "first_name": user.first_name,
+        "last_name": user.last_name
     }
 
+# Startup event to ensure database is ready
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup."""
+    # Import here to avoid circular imports
+    from app.db.init_db import create_tables
+    await create_tables()
+
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorns
     uvicorn.run(app, host="0.0.0.0", port=8000)
