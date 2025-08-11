@@ -5,10 +5,11 @@ from app.core.fastapi_users import fastapi_users, current_active_user
 from app.core.auth import auth_backend
 from app.db.models.user import User
 from app.api.routes.ping import router as ping_router
+from app.api.routes.finance import router as finance_router
 
 app = FastAPI(
     title="Stock Market Monitoring Platform",
-    description="A production-ready FastAPI backend with FastAPI Users authentication",
+    description="A production-ready FastAPI backend with FastAPI Users authentication and YFinance integration",
     version="1.0.0"
 )
 
@@ -43,13 +44,14 @@ app.include_router(
     tags=["users"],
 )
 
-# Include other routes
+# Include API routes
 app.include_router(ping_router, prefix="/api/v1", tags=["health"])
+app.include_router(finance_router, prefix="/api/v1/finance", tags=["finance"])
 
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to Stock Market Monitoring Platform API with FastAPI Users",
+        "message": "Welcome to Stock Market Monitoring Platform API with YFinance",
         "version": "1.0.0",
         "docs": "/docs",
         "auth_endpoints": {
@@ -57,6 +59,17 @@ async def root():
             "login": "/auth/jwt/login",
             "logout": "/auth/jwt/logout",
             "users": "/users/me"
+        },
+        "finance_endpoints": {
+            "quote": "/api/v1/finance/quote/{symbol}",
+            "historical": "/api/v1/finance/historical/{symbol}",
+            "search": "/api/v1/finance/search",
+            "movers": "/api/v1/finance/movers",
+            "company": "/api/v1/finance/company/{symbol}",
+            "news": "/api/v1/finance/news",
+            "market_status": "/api/v1/finance/market-status",
+            "multiple_quotes": "/api/v1/finance/quotes/multiple",
+            "health": "/api/v1/finance/health"
         }
     }
 
@@ -78,5 +91,5 @@ async def startup_event():
     await create_tables()
 
 if __name__ == "__main__":
-    import uvicorns
+    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
