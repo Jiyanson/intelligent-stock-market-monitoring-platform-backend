@@ -19,4 +19,5 @@ class Settings(BaseSettings):
         extra = "ignore"
         populate_by_name = True
 
+
 settings = Settings()

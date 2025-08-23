@@ -1,4 +1,5 @@
-# app/api/routes/finance.py
+# app/api/routes/finance.py - Enhanced version with clearer stock name search
+
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import Dict, Any, List
 from app.services.finance_api import FinanceAPIService, FinanceAPIError
@@ -33,13 +34,50 @@ async def get_historical_data(
     except FinanceAPIError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/search")
-async def search_symbols(
-    query: str = Query(..., description="Search query"),
+@router.get("/search/stocks")
+async def search_stocks_by_name(
+    company_name: str = Query(..., min_length=2, description="Company name to search (e.g., 'Apple', 'Microsoft', 'Tesla')"),
     limit: int = Query(default=10, ge=1, le=50, description="Max results (1-50)"),
     user: User = Depends(current_active_user)
 ) -> Dict[str, Any]:
-    """Search for stock symbols"""
+    """
+    Search for stocks by company name
+    
+    This endpoint allows you to find stocks by searching for company names.
+    Examples:
+    - Search "Apple" to find AAPL
+    - Search "Microsoft" to find MSFT  
+    - Search "Tesla" to find TSLA
+    """
+    try:
+        data = FinanceAPIService.search_symbols(company_name, limit)
+        
+        # Enhanced response with clearer messaging
+        response = {
+            "search_query": company_name,
+            "limit": limit,
+            "total_results": data.get("count", 0),
+            "stocks": data.get("results", []),
+            "provider": data.get("provider", "Alpha Vantage"),
+            "search_tip": "Use company names like 'Apple', 'Google', 'Amazon' for best results"
+        }
+        
+        # If no results found, provide helpful message
+        if response["total_results"] == 0:
+            response["message"] = f"No stocks found for company name '{company_name}'. Try different keywords or check spelling."
+        
+        return response
+        
+    except FinanceAPIError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/search")
+async def search_symbols(
+    query: str = Query(..., description="Search query - can be company name or symbol"),
+    limit: int = Query(default=10, ge=1, le=50, description="Max results (1-50)"),
+    user: User = Depends(current_active_user)
+) -> Dict[str, Any]:
+    """Search for stock symbols (legacy endpoint - use /search/stocks for better experience)"""
     try:
         data = FinanceAPIService.search_symbols(query, limit)
         return {"query": query, "limit": limit, "data": data}
@@ -59,16 +97,39 @@ async def get_market_movers(
     except FinanceAPIError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/news/{symbol}")
-async def get_company_news(
+@router.get("/company/{symbol}")
+async def get_company_info(
     symbol: str,
+    user: User = Depends(current_active_user)
+) -> Dict[str, Any]:
+    """Get detailed company information"""
+    try:
+        data = FinanceAPIService.get_company_info(symbol)
+        return {"symbol": symbol.upper(), "data": data}
+    except FinanceAPIError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/news")
+async def get_market_news(
+    symbol: str = Query(None, description="Stock symbol to filter news (optional)"),
     limit: int = Query(default=10, ge=1, le=50, description="Max news items (1-50)"),
     user: User = Depends(current_active_user)
 ) -> Dict[str, Any]:
-    """Get company news"""
+    """Get market news"""
     try:
-        data = FinanceAPIService.get_company_news(symbol, limit)
-        return {"symbol": symbol.upper(), "limit": limit, "data": data}
+        data = FinanceAPIService.get_market_news(symbol, limit)
+        return {"symbol": symbol, "limit": limit, "data": data}
+    except FinanceAPIError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/market-status")
+async def get_market_status(
+    user: User = Depends(current_active_user)
+) -> Dict[str, Any]:
+    """Get current market status"""
+    try:
+        data = FinanceAPIService.get_market_status()
+        return {"data": data}
     except FinanceAPIError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -95,6 +156,6 @@ async def finance_health():
     try:
         # Simple health check
         FinanceAPIService.get_stock_quote("AAPL")
-        return {"status": "healthy", "provider": "yfinance"}
+        return {"status": "healthy", "provider": "alpha_vantage"}
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
