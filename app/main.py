@@ -9,7 +9,7 @@ from app.api.routes.finance import router as finance_router
 
 app = FastAPI(
     title="Stock Market Monitoring Platform",
-    description="A production-ready FastAPI backend with FastAPI Users authentication and YFinance integration",
+    description="A production-ready FastAPI backend with FastAPI Users authentication and Alpha Vantage integration",
     version="1.0.0"
 )
 
@@ -51,7 +51,7 @@ app.include_router(finance_router, prefix="/api/v1/finance", tags=["finance"])
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to Stock Market Monitoring Platform API with YFinance",
+        "message": "Welcome to Stock Market Monitoring Platform API with Alpha Vantage",
         "version": "1.0.0",
         "docs": "/docs",
         "auth_endpoints": {
@@ -61,6 +61,7 @@ async def root():
             "users": "/users/me"
         },
         "finance_endpoints": {
+            "search_stocks": "/api/v1/finance/search/stocks",  # NEW: Featured endpoint
             "quote": "/api/v1/finance/quote/{symbol}",
             "historical": "/api/v1/finance/historical/{symbol}",
             "search": "/api/v1/finance/search",
@@ -70,6 +71,18 @@ async def root():
             "market_status": "/api/v1/finance/market-status",
             "multiple_quotes": "/api/v1/finance/quotes/multiple",
             "health": "/api/v1/finance/health"
+        },
+        "examples": {
+            "search_stocks": {
+                "url": "/api/v1/finance/search/stocks?company_name=Apple&limit=5",
+                "description": "Search for stocks by company name",
+                "auth_required": True
+            },
+            "get_quote": {
+                "url": "/api/v1/finance/quote/AAPL",
+                "description": "Get current stock price",
+                "auth_required": True
+            }
         }
     }
 
