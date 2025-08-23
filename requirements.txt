@@ -52,8 +52,6 @@ fastapi==0.116.1
 fastapi-users==14.0.1
 fastapi-users-db-sqlalchemy==7.0
 asyncpg>=0.29.0
-yfinance>=0.2.18 
-requests>=2.31.0 
-pandas>=2.0.0 
-lxml>=4.9.0 
-html5lib>=1.1
+# Removed yfinance and pandas dependencies
+# Added requests for Alpha Vantage API calls
+requests>=2.31.0

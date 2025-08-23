@@ -1,9 +1,9 @@
 # app/services/finance_api.py
-import yfinance as yf
 import requests
 import logging
 from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timedelta
+import json
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -14,12 +14,13 @@ class FinanceAPIError(Exception):
 
 class FinanceAPIService:
     """
-    Finance API Service using yfinance library for stock market data.
+    Finance API Service using Alpha Vantage API for stock market data.
     Provides static methods for various financial data operations.
     """
     
-    # Request timeout in seconds
-    REQUEST_TIMEOUT = 30
+    BASE_URL = settings.ALPHA_VANTAGE_BASE_URL
+    API_KEY = settings.ALPHA_VANTAGE_API_KEY
+    REQUEST_TIMEOUT = settings.API_REQUEST_TIMEOUT
     
     @staticmethod
     def _validate_symbol(symbol: str) -> str:
@@ -29,15 +30,45 @@ class FinanceAPIService:
         return symbol.upper().strip()
     
     @staticmethod
-    def _handle_yfinance_error(symbol: str, operation: str) -> None:
-        """Handle common yfinance errors."""
-        logger.error(f"YFinance error during {operation} for symbol {symbol}")
-        raise FinanceAPIError(f"Failed to {operation} for symbol {symbol}")
+    def _make_request(params: Dict[str, Any]) -> Dict[str, Any]:
+        """Make a request to Alpha Vantage API with error handling."""
+        params['apikey'] = FinanceAPIService.API_KEY
+        
+        try:
+            response = requests.get(
+                FinanceAPIService.BASE_URL,
+                params=params,
+                timeout=FinanceAPIService.REQUEST_TIMEOUT
+            )
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            # Check for API errors
+            if 'Error Message' in data:
+                raise FinanceAPIError(f"API Error: {data['Error Message']}")
+            
+            if 'Note' in data:
+                # Rate limit hit
+                raise FinanceAPIError("API rate limit exceeded. Please try again later.")
+            
+            if 'Information' in data:
+                # API limit or other info message
+                raise FinanceAPIError(f"API Info: {data['Information']}")
+            
+            return data
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request error: {e}")
+            raise FinanceAPIError(f"Failed to make API request: {str(e)}")
+        except json.JSONDecodeError as e:
+            logger.error(f"JSON decode error: {e}")
+            raise FinanceAPIError("Invalid response format from API")
     
     @staticmethod
     def get_stock_quote(symbol: str) -> Dict[str, Any]:
         """
-        Get current stock quote for a symbol using yfinance.
+        Get current stock quote for a symbol using Alpha Vantage.
         
         Args:
             symbol: Stock symbol (e.g., 'AAPL', 'GOOGL')
@@ -50,38 +81,34 @@ class FinanceAPIService:
         """
         try:
             symbol = FinanceAPIService._validate_symbol(symbol)
-            ticker = yf.Ticker(symbol)
             
-            # Get current info
-            info = ticker.info
-            if not info or 'regularMarketPrice' not in info:
-                raise FinanceAPIError(f"No data found for symbol {symbol}")
+            params = {
+                'function': 'GLOBAL_QUOTE',
+                'symbol': symbol
+            }
             
-            # Get fast info for real-time data
-            try:
-                fast_info = ticker.fast_info
-                current_price = fast_info.last_price if hasattr(fast_info, 'last_price') else info.get('regularMarketPrice')
-            except:
-                current_price = info.get('regularMarketPrice')
+            data = FinanceAPIService._make_request(params)
             
+            # Parse Alpha Vantage response
+            if 'Global Quote' not in data:
+                raise FinanceAPIError(f"No quote data found for symbol {symbol}")
+            
+            quote = data['Global Quote']
+            
+            # Alpha Vantage returns data with prefixed keys
             return {
                 "symbol": symbol,
-                "current_price": current_price,
-                "previous_close": info.get('previousClose'),
-                "open": info.get('regularMarketOpen'),
-                "day_high": info.get('regularMarketDayHigh'),
-                "day_low": info.get('regularMarketDayLow'),
-                "volume": info.get('regularMarketVolume'),
-                "market_cap": info.get('marketCap'),
-                "pe_ratio": info.get('trailingPE'),
-                "eps": info.get('trailingEps'),
-                "dividend_yield": info.get('dividendYield'),
-                "52_week_high": info.get('fiftyTwoWeekHigh'),
-                "52_week_low": info.get('fiftyTwoWeekLow'),
-                "currency": info.get('currency'),
-                "exchange": info.get('exchange'),
-                "timezone": info.get('timeZoneFullName'),
-                "last_updated": datetime.now().isoformat()
+                "current_price": float(quote.get('05. price', 0)),
+                "previous_close": float(quote.get('08. previous close', 0)),
+                "open": float(quote.get('02. open', 0)),
+                "day_high": float(quote.get('03. high', 0)),
+                "day_low": float(quote.get('04. low', 0)),
+                "volume": int(quote.get('06. volume', 0)),
+                "change": float(quote.get('09. change', 0)),
+                "change_percent": quote.get('10. change percent', '0%').replace('%', ''),
+                "last_trading_day": quote.get('07. latest trading day'),
+                "last_updated": datetime.now().isoformat(),
+                "provider": "Alpha Vantage"
             }
             
         except FinanceAPIError:
@@ -99,14 +126,14 @@ class FinanceAPIService:
         end: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Get historical stock data using yfinance.
+        Get historical stock data using Alpha Vantage.
         
         Args:
             symbol: Stock symbol
-            period: Data period (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)
-            interval: Data interval (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)
-            start: Start date (YYYY-MM-DD format)
-            end: End date (YYYY-MM-DD format)
+            period: Data period (not directly used, mapped to Alpha Vantage functions)
+            interval: Data interval (maps to Alpha Vantage intervals)
+            start: Start date (not used in this implementation)
+            end: End date (not used in this implementation)
             
         Returns:
             Dictionary containing historical data
@@ -116,37 +143,55 @@ class FinanceAPIService:
         """
         try:
             symbol = FinanceAPIService._validate_symbol(symbol)
-            ticker = yf.Ticker(symbol)
             
-            # Get historical data
-            if start and end:
-                hist = ticker.history(start=start, end=end, interval=interval)
+            # Map intervals to Alpha Vantage functions
+            if interval in ['1min', '5min', '15min', '30min', '60min']:
+                function = 'TIME_SERIES_INTRADAY'
+                params = {
+                    'function': function,
+                    'symbol': symbol,
+                    'interval': interval
+                }
+                time_series_key = f'Time Series ({interval})'
             else:
-                hist = ticker.history(period=period, interval=interval)
+                # Default to daily
+                function = 'TIME_SERIES_DAILY'
+                params = {
+                    'function': function,
+                    'symbol': symbol
+                }
+                time_series_key = 'Time Series (Daily)'
             
-            if hist.empty:
+            data = FinanceAPIService._make_request(params)
+            
+            if time_series_key not in data:
                 raise FinanceAPIError(f"No historical data found for symbol {symbol}")
             
-            # Convert to dictionary format
-            data = []
-            for date, row in hist.iterrows():
-                data.append({
-                    "date": date.isoformat(),
-                    "open": float(row['Open']) if not pd.isna(row['Open']) else None,
-                    "high": float(row['High']) if not pd.isna(row['High']) else None,
-                    "low": float(row['Low']) if not pd.isna(row['Low']) else None,
-                    "close": float(row['Close']) if not pd.isna(row['Close']) else None,
-                    "volume": int(row['Volume']) if not pd.isna(row['Volume']) else None,
+            time_series = data[time_series_key]
+            
+            # Convert to standard format
+            historical_data = []
+            for date_str, values in time_series.items():
+                historical_data.append({
+                    "date": date_str,
+                    "open": float(values.get('1. open', 0)),
+                    "high": float(values.get('2. high', 0)),
+                    "low": float(values.get('3. low', 0)),
+                    "close": float(values.get('4. close', 0)),
+                    "volume": int(values.get('5. volume', 0))
                 })
+            
+            # Sort by date (most recent first)
+            historical_data.sort(key=lambda x: x['date'], reverse=True)
             
             return {
                 "symbol": symbol,
                 "period": period,
                 "interval": interval,
-                "start": start,
-                "end": end,
-                "count": len(data),
-                "data": data
+                "function": function,
+                "count": len(historical_data),
+                "data": historical_data,
+                "provider": "Alpha Vantage"
             }
             
         except FinanceAPIError:
@@ -158,7 +203,7 @@ class FinanceAPIService:
     @staticmethod
     def search_symbols(query: str, limit: int = 10) -> Dict[str, Any]:
         """
-        Search for stock symbols using Yahoo Finance search API.
+        Search for stock symbols using Alpha Vantage.
         
         Args:
             query: Search query
@@ -171,40 +216,46 @@ class FinanceAPIService:
             FinanceAPIError: If request fails
         """
         try:
-            url = "https://query1.finance.yahoo.com/v1/finance/search"
             params = {
-                "q": query,
-                "quotesCount": limit,
-                "newsCount": 0,
-                "listsCount": 0
+                'function': 'SYMBOL_SEARCH',
+                'keywords': query
             }
             
-            response = requests.get(url, params=params, timeout=FinanceAPIService.REQUEST_TIMEOUT)
-            response.raise_for_status()
+            data = FinanceAPIService._make_request(params)
             
-            data = response.json()
-            quotes = data.get('quotes', [])
+            if 'bestMatches' not in data:
+                return {
+                    "query": query,
+                    "count": 0,
+                    "results": [],
+                    "provider": "Alpha Vantage"
+                }
+            
+            matches = data['bestMatches'][:limit]
             
             results = []
-            for quote in quotes:
+            for match in matches:
                 results.append({
-                    "symbol": quote.get('symbol'),
-                    "name": quote.get('shortname') or quote.get('longname'),
-                    "exchange": quote.get('exchange'),
-                    "type": quote.get('quoteType'),
-                    "sector": quote.get('sector'),
-                    "industry": quote.get('industry')
+                    "symbol": match.get('1. symbol'),
+                    "name": match.get('2. name'),
+                    "type": match.get('3. type'),
+                    "region": match.get('4. region'),
+                    "market_open": match.get('5. marketOpen'),
+                    "market_close": match.get('6. marketClose'),
+                    "timezone": match.get('7. timezone'),
+                    "currency": match.get('8. currency'),
+                    "match_score": float(match.get('9. matchScore', 0))
                 })
             
             return {
                 "query": query,
                 "count": len(results),
-                "results": results
+                "results": results,
+                "provider": "Alpha Vantage"
             }
             
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Request error searching for {query}: {e}")
-            raise FinanceAPIError(f"Failed to search symbols: {str(e)}")
+        except FinanceAPIError:
+            raise
         except Exception as e:
             logger.error(f"Error searching symbols for query {query}: {e}")
             raise FinanceAPIError(f"Failed to search symbols: {str(e)}")
@@ -212,7 +263,8 @@ class FinanceAPIService:
     @staticmethod
     def get_market_movers(market_type: str = "gainers", count: int = 10) -> Dict[str, Any]:
         """
-        Get market movers (gainers, losers, most active) using Yahoo Finance.
+        Get market movers. Note: Alpha Vantage doesn't have a direct endpoint for this.
+        This is a placeholder implementation that could be enhanced with additional logic.
         
         Args:
             market_type: Type of movers ('gainers', 'losers', 'most_active')
@@ -225,51 +277,16 @@ class FinanceAPIService:
             FinanceAPIError: If request fails
         """
         try:
-            screener_map = {
-                "gainers": "day_gainers",
-                "losers": "day_losers", 
-                "most_active": "most_actives"
-            }
-            
-            if market_type not in screener_map:
-                raise FinanceAPIError(f"Invalid market_type: {market_type}")
-            
-            url = "https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved"
-            params = {
-                "formatted": "true",
-                "lang": "en-US",
-                "region": "US",
-                "scrIds": screener_map[market_type],
-                "count": count
-            }
-            
-            response = requests.get(url, params=params, timeout=FinanceAPIService.REQUEST_TIMEOUT)
-            response.raise_for_status()
-            
-            data = response.json()
-            quotes = data.get('finance', {}).get('result', [{}])[0].get('quotes', [])
-            
-            results = []
-            for quote in quotes:
-                results.append({
-                    "symbol": quote.get('symbol'),
-                    "name": quote.get('shortName'),
-                    "price": quote.get('regularMarketPrice'),
-                    "change": quote.get('regularMarketChange'),
-                    "change_percent": quote.get('regularMarketChangePercent'),
-                    "volume": quote.get('regularMarketVolume'),
-                    "market_cap": quote.get('marketCap')
-                })
-            
+            # Alpha Vantage doesn't have market movers endpoint
+            # This would need to be implemented using other data or a different approach
             return {
                 "market_type": market_type,
-                "count": len(results),
-                "results": results
+                "count": 0,
+                "results": [],
+                "message": "Market movers not available with Alpha Vantage. Consider using sector performance or implement custom logic.",
+                "provider": "Alpha Vantage"
             }
             
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Request error getting market movers: {e}")
-            raise FinanceAPIError(f"Failed to get market movers: {str(e)}")
         except Exception as e:
             logger.error(f"Error getting market movers: {e}")
             raise FinanceAPIError(f"Failed to get market movers: {str(e)}")
@@ -277,7 +294,7 @@ class FinanceAPIService:
     @staticmethod
     def get_company_info(symbol: str) -> Dict[str, Any]:
         """
-        Get company information and profile using yfinance.
+        Get company information using Alpha Vantage.
         
         Args:
             symbol: Stock symbol
@@ -290,45 +307,45 @@ class FinanceAPIService:
         """
         try:
             symbol = FinanceAPIService._validate_symbol(symbol)
-            ticker = yf.Ticker(symbol)
             
-            info = ticker.info
-            if not info:
+            params = {
+                'function': 'OVERVIEW',
+                'symbol': symbol
+            }
+            
+            data = FinanceAPIService._make_request(params)
+            
+            if not data or data.get('Symbol') != symbol:
                 raise FinanceAPIError(f"No company info found for symbol {symbol}")
             
             return {
                 "symbol": symbol,
-                "name": info.get('longName') or info.get('shortName'),
-                "sector": info.get('sector'),
-                "industry": info.get('industry'),
-                "description": info.get('longBusinessSummary'),
-                "website": info.get('website'),
-                "employees": info.get('fullTimeEmployees'),
-                "headquarters": {
-                    "city": info.get('city'),
-                    "state": info.get('state'),
-                    "country": info.get('country'),
-                    "address": info.get('address1')
-                },
+                "name": data.get('Name'),
+                "description": data.get('Description'),
+                "sector": data.get('Sector'),
+                "industry": data.get('Industry'),
+                "exchange": data.get('Exchange'),
+                "currency": data.get('Currency'),
+                "country": data.get('Country'),
+                "address": data.get('Address'),
                 "financials": {
-                    "market_cap": info.get('marketCap'),
-                    "enterprise_value": info.get('enterpriseValue'),
-                    "pe_ratio": info.get('trailingPE'),
-                    "peg_ratio": info.get('pegRatio'),
-                    "price_to_book": info.get('priceToBook'),
-                    "debt_to_equity": info.get('debtToEquity'),
-                    "roe": info.get('returnOnEquity'),
-                    "revenue": info.get('totalRevenue'),
-                    "gross_margins": info.get('grossMargins'),
-                    "operating_margins": info.get('operatingMargins'),
-                    "profit_margins": info.get('profitMargins')
+                    "market_cap": int(data.get('MarketCapitalization', 0)) if data.get('MarketCapitalization') else None,
+                    "pe_ratio": float(data.get('PERatio', 0)) if data.get('PERatio') != 'None' else None,
+                    "peg_ratio": float(data.get('PEGRatio', 0)) if data.get('PEGRatio') != 'None' else None,
+                    "price_to_book": float(data.get('PriceToBookRatio', 0)) if data.get('PriceToBookRatio') != 'None' else None,
+                    "dividend_per_share": float(data.get('DividendPerShare', 0)) if data.get('DividendPerShare') != 'None' else None,
+                    "dividend_yield": float(data.get('DividendYield', 0)) if data.get('DividendYield') != 'None' else None,
+                    "eps": float(data.get('EPS', 0)) if data.get('EPS') != 'None' else None,
+                    "revenue_per_share": float(data.get('RevenuePerShareTTM', 0)) if data.get('RevenuePerShareTTM') != 'None' else None,
+                    "profit_margin": float(data.get('ProfitMargin', 0)) if data.get('ProfitMargin') != 'None' else None,
+                    "operating_margin": float(data.get('OperatingMarginTTM', 0)) if data.get('OperatingMarginTTM') != 'None' else None,
+                    "beta": float(data.get('Beta', 0)) if data.get('Beta') != 'None' else None,
+                    "52_week_high": float(data.get('52WeekHigh', 0)) if data.get('52WeekHigh') != 'None' else None,
+                    "52_week_low": float(data.get('52WeekLow', 0)) if data.get('52WeekLow') != 'None' else None,
                 },
-                "dividend_info": {
-                    "dividend_rate": info.get('dividendRate'),
-                    "dividend_yield": info.get('dividendYield'),
-                    "payout_ratio": info.get('payoutRatio'),
-                    "ex_dividend_date": info.get('exDividendDate')
-                }
+                "analyst_rating": data.get('AnalystTargetPrice'),
+                "last_updated": datetime.now().isoformat(),
+                "provider": "Alpha Vantage"
             }
             
         except FinanceAPIError:
@@ -340,7 +357,7 @@ class FinanceAPIService:
     @staticmethod
     def get_market_news(symbol: Optional[str] = None, limit: int = 10) -> Dict[str, Any]:
         """
-        Get market news, optionally filtered by symbol using yfinance.
+        Get market news using Alpha Vantage.
         
         Args:
             symbol: Stock symbol to filter news (optional)
@@ -353,57 +370,55 @@ class FinanceAPIService:
             FinanceAPIError: If request fails
         """
         try:
+            params = {
+                'function': 'NEWS_SENTIMENT'
+            }
+            
             if symbol:
-                # Get company-specific news
                 symbol = FinanceAPIService._validate_symbol(symbol)
-                ticker = yf.Ticker(symbol)
-                news = ticker.news
-                
-                results = []
-                for item in news[:limit]:
-                    results.append({
-                        "title": item.get('title'),
-                        "link": item.get('link'),
-                        "published": item.get('providerPublishTime'),
-                        "publisher": item.get('publisher'),
-                        "summary": item.get('summary'),
-                        "thumbnail": item.get('thumbnail', {}).get('resolutions', [{}])[0].get('url') if item.get('thumbnail') else None
-                    })
-                
+                params['tickers'] = symbol
+            
+            # Add limit parameter
+            params['limit'] = limit
+            
+            data = FinanceAPIService._make_request(params)
+            
+            if 'feed' not in data:
                 return {
                     "symbol": symbol,
-                    "count": len(results),
-                    "news": results
+                    "count": 0,
+                    "news": [],
+                    "provider": "Alpha Vantage"
                 }
-            else:
-                # Get general market news using Yahoo Finance trending endpoint
-                url = "https://query1.finance.yahoo.com/v1/finance/trending/US"
-                params = {"count": limit}
+            
+            news_items = data['feed'][:limit]
+            
+            results = []
+            for item in news_items:
+                results.append({
+                    "title": item.get('title'),
+                    "url": item.get('url'),
+                    "published": item.get('time_published'),
+                    "summary": item.get('summary'),
+                    "banner_image": item.get('banner_image'),
+                    "source": item.get('source'),
+                    "category": item.get('category_within_source'),
+                    "sentiment": {
+                        "label": item.get('overall_sentiment_label'),
+                        "score": float(item.get('overall_sentiment_score', 0))
+                    },
+                    "relevance_score": float(item.get('relevance_score', 0)) if symbol else None
+                })
+            
+            return {
+                "symbol": symbol,
+                "count": len(results),
+                "news": results,
+                "provider": "Alpha Vantage"
+            }
                 
-                response = requests.get(url, params=params, timeout=FinanceAPIService.REQUEST_TIMEOUT)
-                response.raise_for_status()
-                
-                data = response.json()
-                quotes = data.get('finance', {}).get('result', [{}])[0].get('quotes', [])
-                
-                results = []
-                for quote in quotes:
-                    results.append({
-                        "symbol": quote.get('symbol'),
-                        "name": quote.get('shortName'),
-                        "price": quote.get('regularMarketPrice'),
-                        "change_percent": quote.get('regularMarketChangePercent')
-                    })
-                
-                return {
-                    "type": "trending",
-                    "count": len(results),
-                    "trending_stocks": results
-                }
-                
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Request error getting news: {e}")
-            raise FinanceAPIError(f"Failed to get market news: {str(e)}")
+        except FinanceAPIError:
+            raise
         except Exception as e:
             logger.error(f"Error getting market news: {e}")
             raise FinanceAPIError(f"Failed to get market news: {str(e)}")
@@ -411,7 +426,8 @@ class FinanceAPIService:
     @staticmethod
     def get_market_status() -> Dict[str, Any]:
         """
-        Get current market status (open/closed).
+        Get current market status. Alpha Vantage doesn't have a direct endpoint,
+        so this uses logic to determine market hours.
         
         Returns:
             Dictionary containing market status information
@@ -420,15 +436,10 @@ class FinanceAPIService:
             FinanceAPIError: If request fails
         """
         try:
-            # Use a major index to check market status
-            ticker = yf.Ticker("^GSPC")  # S&P 500
-            info = ticker.info
-            
-            # Check if we have recent data
             now = datetime.now()
             is_weekday = now.weekday() < 5  # Monday = 0, Sunday = 6
             
-            # Market hours: 9:30 AM - 4:00 PM ET (approximately)
+            # Market hours: 9:30 AM - 4:00 PM ET
             market_open_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
             market_close_time = now.replace(hour=16, minute=0, second=0, microsecond=0)
             
@@ -453,7 +464,9 @@ class FinanceAPIService:
                 "current_time": now.isoformat(),
                 "next_open": market_open_time.isoformat() if not is_open else None,
                 "next_close": market_close_time.isoformat() if is_open else None,
-                "timezone": "US/Eastern"
+                "timezone": "US/Eastern",
+                "note": "Market status calculated locally (Alpha Vantage doesn't provide real-time market status)",
+                "provider": "Alpha Vantage"
             }
             
         except Exception as e:
@@ -464,6 +477,7 @@ class FinanceAPIService:
     def get_multiple_quotes(symbols: List[str]) -> Dict[str, Any]:
         """
         Get quotes for multiple symbols at once.
+        Note: Alpha Vantage requires individual requests for each symbol.
         
         Args:
             symbols: List of stock symbols
@@ -478,46 +492,43 @@ class FinanceAPIService:
             if not symbols or len(symbols) == 0:
                 raise FinanceAPIError("No symbols provided")
             
-            # Validate and format symbols
+            # Validate symbols
             validated_symbols = [FinanceAPIService._validate_symbol(s) for s in symbols]
             
-            # Create tickers string
-            tickers = yf.Tickers(' '.join(validated_symbols))
-            
             results = {}
+            successful_count = 0
+            
             for symbol in validated_symbols:
                 try:
-                    ticker = tickers.tickers[symbol]
-                    info = ticker.info
+                    quote_data = FinanceAPIService.get_stock_quote(symbol)
+                    results[symbol] = {
+                        "symbol": symbol,
+                        "current_price": quote_data.get('current_price'),
+                        "previous_close": quote_data.get('previous_close'),
+                        "change": quote_data.get('change'),
+                        "change_percent": quote_data.get('change_percent'),
+                        "volume": quote_data.get('volume'),
+                        "last_trading_day": quote_data.get('last_trading_day')
+                    }
+                    successful_count += 1
                     
-                    if info and 'regularMarketPrice' in info:
-                        results[symbol] = {
-                            "symbol": symbol,
-                            "current_price": info.get('regularMarketPrice'),
-                            "previous_close": info.get('previousClose'),
-                            "change": info.get('regularMarketChange'),
-                            "change_percent": info.get('regularMarketChangePercent'),
-                            "volume": info.get('regularMarketVolume')
-                        }
-                    else:
-                        results[symbol] = {"error": "No data available"}
-                        
-                except Exception as e:
+                    # Add a small delay to avoid rate limiting
+                    import time
+                    time.sleep(0.1)  # 100ms delay between requests
+                    
+                except FinanceAPIError as e:
                     results[symbol] = {"error": str(e)}
+                except Exception as e:
+                    results[symbol] = {"error": f"Unexpected error: {str(e)}"}
             
             return {
                 "requested_symbols": validated_symbols,
-                "successful_count": len([r for r in results.values() if 'error' not in r]),
-                "results": results
+                "successful_count": successful_count,
+                "results": results,
+                "provider": "Alpha Vantage",
+                "note": "Multiple quotes require individual API calls with Alpha Vantage"
             }
             
         except Exception as e:
             logger.error(f"Error getting multiple quotes: {e}")
             raise FinanceAPIError(f"Failed to get multiple quotes: {str(e)}")
-
-# Import pandas for data processing
-try:
-    import pandas as pd
-except ImportError:
-    logger.warning("pandas not installed, some functionality may be limited")
-    pd = None
