@@ -6,11 +6,12 @@ from app.core.auth import auth_backend
 from app.db.models.user import User
 from app.api.routes.ping import router as ping_router
 from app.api.routes.finance import router as finance_router
+from app.api.routes.watchlist import router as watchlist_router
 
 app = FastAPI(
     title="Stock Market Monitoring Platform",
-    description="A production-ready FastAPI backend with FastAPI Users authentication and Alpha Vantage integration",
-    version="1.0.0"
+    description="A production-ready FastAPI backend with FastAPI Users authentication, Alpha Vantage integration, and Watchlist management",
+    version="1.1.0"
 )
 
 # Include authentication routes
@@ -47,12 +48,13 @@ app.include_router(
 # Include API routes
 app.include_router(ping_router, prefix="/api/v1", tags=["health"])
 app.include_router(finance_router, prefix="/api/v1/finance", tags=["finance"])
+app.include_router(watchlist_router, prefix="/api/v1/watchlist", tags=["watchlist"])
 
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to Stock Market Monitoring Platform API with Alpha Vantage",
-        "version": "1.0.0",
+        "message": "Welcome to Stock Market Monitoring Platform API with Alpha Vantage and Watchlist",
+        "version": "1.1.0",
         "docs": "/docs",
         "auth_endpoints": {
             "register": "/auth/register",
@@ -61,7 +63,7 @@ async def root():
             "users": "/users/me"
         },
         "finance_endpoints": {
-            "search_stocks": "/api/v1/finance/search/stocks",  # NEW: Featured endpoint
+            "search_stocks": "/api/v1/finance/search/stocks",
             "quote": "/api/v1/finance/quote/{symbol}",
             "historical": "/api/v1/finance/historical/{symbol}",
             "search": "/api/v1/finance/search",
@@ -72,15 +74,25 @@ async def root():
             "multiple_quotes": "/api/v1/finance/quotes/multiple",
             "health": "/api/v1/finance/health"
         },
+        "watchlist_endpoints": {
+            "add": "POST /api/v1/watchlist/",
+            "list": "GET /api/v1/watchlist/",
+            "list_with_quotes": "GET /api/v1/watchlist/with-quotes",
+            "get_item": "GET /api/v1/watchlist/{watchlist_id}",
+            "update": "PATCH /api/v1/watchlist/{watchlist_id}",
+            "remove": "DELETE /api/v1/watchlist/{watchlist_id}",
+            "remove_by_symbol": "DELETE /api/v1/watchlist/symbol/{symbol}",
+            "check": "GET /api/v1/watchlist/check/{symbol}"
+        },
         "examples": {
-            "search_stocks": {
-                "url": "/api/v1/finance/search/stocks?company_name=Apple&limit=5",
-                "description": "Search for stocks by company name",
+            "add_to_watchlist": {
+                "url": "POST /api/v1/watchlist/",
+                "body": {"symbol": "AAPL", "notes": "Watch for Q4 earnings"},
                 "auth_required": True
             },
-            "get_quote": {
-                "url": "/api/v1/finance/quote/AAPL",
-                "description": "Get current stock price",
+            "get_watchlist_with_prices": {
+                "url": "/api/v1/watchlist/with-quotes",
+                "description": "Get your watchlist with current stock prices",
                 "auth_required": True
             }
         }
@@ -99,7 +111,6 @@ async def protected_route(user: User = Depends(current_active_user)):
 @app.on_event("startup")
 async def startup_event():
     """Initialize database on startup."""
-    # Import here to avoid circular imports
     from app.db.init_db import create_tables
     await create_tables()
 
