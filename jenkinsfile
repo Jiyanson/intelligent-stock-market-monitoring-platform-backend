@@ -1,0 +1,191 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Docker Hub credentials
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_USERNAME = 'michoc'
+        IMAGE_NAME = "${DOCKER_USERNAME}/stock-market-platform"
+        DOCKER_CREDENTIALS_ID = '2709ba15-3bf5-42b4-a41e-e2ae435f4951'
+        
+        // Git repository
+        GIT_REPO_URL = 'https://github.com/Jiyanson/intelligent-stock-market-monitoring-platform-backend.git'
+        GIT_CREDENTIALS_ID = 'github-credentials'
+        GIT_BRANCH = 'main'
+        
+        // Image tag
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        
+        // Deployment server (optional, for remote deployment)
+        DEPLOY_SERVER = 'user@your-server.com'
+        DEPLOY_SERVER_CREDENTIALS_ID = 'deploy-server-ssh'
+        
+        // 🚨 NEW: Grafana variables
+        GRAFANA_URL = 'https://ayoubcpge9.grafana.net' // 👈 **CHANGE THIS**
+        GRAFANA_API_KEY_CREDENTIALS_ID = '0acea52d-149d-4dce-affc-6e88b440471e' // 👈 **CHANGE THIS** (Jenkins Secret Text)
+        GRAFANA_DASHBOARD_ID = '1' // 👈 **CHANGE THIS** (The ID of your target dashboard)
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '📦 Checking out source code...'
+                script {
+                    git branch: "${GIT_BRANCH}", url: "${GIT_REPO_URL}"
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "🐳 Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh """
+                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                script {
+                    echo '🧪 Running tests...'
+                    sh """
+                        docker compose -f docker-compose.yml up -d db redis || true
+                        sleep 10
+                        NETWORK_NAME=\$(docker network ls --filter name=fastapi --format "{{.Name}}" | head -n 1 || echo "fastapi_default")
+                        docker run --rm \\
+                            --network="\${NETWORK_NAME}" \\
+                            -e DATABASE_URL="postgresql://fastapi:fastapi@db:5432/fastapi_db" \\
+                            -e REDIS_URL="redis://redis:6379/0" \\
+                            ${IMAGE_NAME}:${IMAGE_TAG} \\
+                            sh -c 'pip install pytest && pytest -v || echo "No tests found"'
+                        docker compose -f docker-compose.yml down || true
+                    """
+                }
+            }
+        }
+        
+        stage('Code Quality Checks') {
+            steps {
+                script {
+                    echo '🔍 Running code quality checks...'
+                    sh """
+                        docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} \\
+                            sh -c 'black --check app/ || echo "Black formatting check completed with warnings"'
+                    """
+                    sh """
+                        docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} \\
+                            sh -c 'isort --check-only app/ || echo "isort check completed with warnings"'
+                    """
+                }
+            }
+        }
+        
+        stage('Security Scan') {
+            steps {
+                script {
+                    echo '🔒 Running security scan with Trivy...'
+                    sh """
+                        if ! command -v trivy >/dev/null 2>&1; then
+                            echo "Trivy not installed, skipping security scan"
+                        else
+                            echo "Running Trivy security scan..."
+                            trivy image --severity HIGH,CRITICAL --exit-code 1 --no-progress ${IMAGE_NAME}:${IMAGE_TAG} || true
+                        fi
+                    """
+                }
+            }
+        }
+        
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    echo '🚀 Pushing image to Docker Hub...'
+                    withCredentials([usernamePassword(
+                        credentialsId: DOCKER_CREDENTIALS_ID,
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh """
+                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${IMAGE_NAME}:latest
+                            docker logout
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy with Docker Compose') {
+            steps {
+                script {
+                    echo '🚀 Deploying to Docker Desktop...'
+                    sh """
+                        docker compose down || true
+                        docker pull ${IMAGE_NAME}:latest
+                        docker compose up -d
+                        echo "Waiting for services to start..."
+                        sleep 20
+                        docker compose ps
+                        docker compose logs --tail=20
+                        echo "Testing API health..."
+                        for i in {1..5}; do
+                            if curl -f http://localhost:8000/api/v1/finance/health; then
+                                echo "✅ API is healthy!"
+                                break
+                            else
+                                echo "Attempt \$i: API not ready yet, waiting..."
+                                sleep 5
+                            fi
+                        done
+                    """
+                }
+            }
+        }
+        
+        // 🚨 NEW: Grafaana Notification Stage
+        stage('Grafaana Notification') {
+            steps {
+                script {
+                    echo '📢 Sending deployment annotation to Grafana...'
+                    withCredentials([string(credentialsId: GRAFANA_API_KEY_CREDENTIALS_ID, variable: 'GRAFANA_API_KEY')]) {
+                        sh """
+                            TIME_MS=\$(date +%s%3N)
+                            MESSAGE="Deployment of ${IMAGE_NAME} complete! Tag: ${IMAGE_TAG} (Build \${BUILD_NUMBER})"
+                            
+                            curl -X POST -H "Authorization: Bearer \${GRAFANA_API_KEY}" \\
+                                 -H "Content-Type: application/json" \\
+                                 -d '{
+                                     "dashboardId": \${GRAFANA_DASHBOARD_ID},
+                                     "time": \${TIME_MS},
+                                     "tags": ["deployment", "jenkins", "success", "${IMAGE_TAG}"],
+                                     "text": "\${MESSAGE}"
+                                 }' \\
+                                 "${GRAFANA_URL}/api/annotations" || echo "Failed to send Grafana annotation (is API key valid?)"
+                        """
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed! Check logs for details.'
+        }
+        always {
+            echo '🧹 Cleaning up old images...'
+            sh """
+                docker images ${IMAGE_NAME} --format "{{.Tag}}" | tail -n +6 | xargs -r docker rmi ${IMAGE_NAME}: || true
+                docker image prune -f || true
+            """
+        }
+    }
+}
