@@ -19,7 +19,7 @@ from datetime import datetime
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from llm_integration import SecurityAnalysisLLM
+from improved_llm_integration import SecurityAnalysisLLM, VulnerabilityAnalyzer
 from html_report_generator import HTMLReportGenerator
 
 
@@ -43,11 +43,13 @@ class SecurityReportOrchestrator:
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize components
-        print("🤖 Initializing AI Security Analysis System...")
+        print("🤖 Initializing IMPROVED AI Security Analysis System...")
         print(f"   Using DeepSeek R1 and Llama models via HuggingFace")
+        print(f"   ✨ NEW: Processes ALL vulnerabilities with detailed package analysis")
 
         self.llm = SecurityAnalysisLLM(hf_token, preferred_model="deepseek")
         self.html_generator = HTMLReportGenerator()
+        self.analyzer = VulnerabilityAnalyzer()
 
         self.vulnerability_data = None
         self.ai_insights = {}
@@ -62,8 +64,24 @@ class SecurityReportOrchestrator:
             with open(self.normalized_data_path, 'r') as f:
                 self.vulnerability_data = json.load(f)
 
-            total_vulns = self.vulnerability_data.get('risk_metrics', {}).get('total', 0)
-            print(f"✅ Loaded {total_vulns} vulnerabilities from normalized data")
+            # IMPROVED: Analyze data for integrity
+            vulnerabilities = self.vulnerability_data.get('vulnerabilities', [])
+            risk_total = self.vulnerability_data.get('risk_metrics', {}).get('total', 0)
+            array_length = len(vulnerabilities)
+
+            print(f"✅ Loaded vulnerability data:")
+            print(f"   • Vulnerabilities in array: {array_length}")
+            print(f"   • Total in risk_metrics: {risk_total}")
+
+            if array_length != risk_total:
+                print(f"   ⚠️  WARNING: Count mismatch detected!")
+                print(f"   ℹ️  Using actual array length ({array_length}) for analysis")
+
+            # Run comprehensive analysis
+            analysis = self.analyzer.analyze_vulnerabilities(vulnerabilities)
+            print(f"   • Analyzed: {analysis['total_count']} vulnerabilities")
+            print(f"   • Critical: {analysis['critical_count']}, High: {analysis['high_count']}")
+
             return True
 
         except Exception as e:
