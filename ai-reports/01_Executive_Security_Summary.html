@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Executive Security Summary — Build #LOCAL</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font:14px/1.5 system-ui,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;margin:24px;color:#1f2328}
+ h1,h2{margin:0 0 8px} h1{font-size:22px} h2{font-size:16px;margin-top:24px}
+ .kpi{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
+ .kpi div{border:1px solid #e0e4e8;border-radius:8px;padding:10px 12px;min-width:140px}
+ .sev{display:inline-block;border-radius:6px;padding:2px 8px;margin-right:6px}
+ .critical{background:#ffe8e6;color:#a40000} .high{background:#fff0d6;color:#8a4b00}
+ .medium{background:#eef2ff;color:#223076} .low{background:#eef7f0;color:#174d1a}
+ table{width:100%;border-collapse:collapse;margin:8px 0 16px}
+ th,td{border:1px solid #e6e9ed;padding:8px;text-align:left;vertical-align:top}
+ small{color:#57606a}
+ .tag{display:inline-block;background:#f2f4f7;border:1px solid #e3e6ea;border-radius:6px;padding:0 6px;margin-right:6px}
+ .alert{background:#fff5e6;border-left:4px solid #ff9500;padding:12px;margin:12px 0}
+</style>
+</head>
+<body>
+<h1>Executive Security Summary <small>— Build #LOCAL • 2025-11-09</small></h1>
+
+<div class="kpi">
+  <div><strong>Total Vulnerabilities</strong><br><span style="font-size:24px">4</span></div>
+  <div><strong>Risk Score</strong><br><span style="font-size:24px;color:#a40000">27</span></div>
+  <div><strong>Severity Breakdown</strong><br>
+    <span class="sev critical">Critical: 2</span>
+    <span class="sev high">High: 1</span>
+    <span class="sev medium">Medium: 1</span>
+    <span class="sev low">Low: 0</span>
+  </div>
+  <div><strong>Quality Gate</strong><br><span class="tag">BLOCKED</span></div>
+</div>
+
+<div class="alert">
+  <strong>⚠️ Security Alert:</strong> 2 critical and 1 high-severity vulnerabilities detected. Immediate action required.
+</div>
+
+<h2>Top 3 Critical Risks (Prioritized)</h2>
+<table>
+  <thead><tr><th>Finding</th><th>Source</th><th>Severity</th><th>Fix ETA</th></tr></thead>
+  <tbody>
+    
+        <tr>
+            <td><strong>Critical vulnerability in openssl</strong><br><small>openssl</small></td>
+            <td>Trivy</td>
+            <td><span class="sev critical">CRITICAL</span></td>
+            <td>24h</td>
+        </tr>
+        
+        <tr>
+            <td><strong>Hardcoded AWS Access Key</strong><br><small>config/aws.py</small></td>
+            <td>Gitleaks</td>
+            <td><span class="sev critical">CRITICAL</span></td>
+            <td>24h</td>
+        </tr>
+        
+        <tr>
+            <td><strong>SQL Injection vulnerability in user query</strong><br><small>app/database/queries.py</small></td>
+            <td>Semgrep</td>
+            <td><span class="sev high">HIGH</span></td>
+            <td>72h</td>
+        </tr>
+        
+  </tbody>
+</table>
+
+<h2>Remediation Plan</h2>
+<ul>
+  <li><strong>Container Security</strong>: Update 0 vulnerable base packages. Rebuild images with latest patches.</li>
+  <li><strong>Dependencies</strong>: Upgrade 1 packages with known CVEs. Review SBOM and apply updates.</li>
+  <li><strong>Code Issues</strong>: Fix 2 source files flagged by SAST scans.</li>
+  <li><strong>Verification</strong>: Re-scan after fixes; add regression tests; update security baseline.</li>
+</ul>
+
+<h2>Standards Alignment</h2>
+<p>
+  <span class="tag">ISO 27001 A.12.6.1</span>
+  <span class="tag">NIST SSDF PW.7</span>
+  <span class="tag">OWASP ASVS 14.2</span>
+  <span class="tag">PCI-DSS 6.2</span>
+</p>
+
+<h2>Next Steps</h2>
+<ol>
+  <li>Review this executive summary with security and DevOps teams</li>
+  <li>Prioritize fixes based on severity and business impact</li>
+  <li>Apply patches for critical/high vulnerabilities within SLA</li>
+  <li>Re-run security scans to verify remediation</li>
+  <li>Update security documentation and runbooks</li>
+</ol>
+
+</body>
+</html>
