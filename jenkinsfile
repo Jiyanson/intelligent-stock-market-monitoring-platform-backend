@@ -40,7 +40,7 @@ pipeline {
                     echo '📁 Creating report directories...'
                     sh '''
                         mkdir -p reports processed ai-reports ai-policies
-                        chmod -R 755 reports processed ai-reports ai-policies
+                        chmod -R 755 reports processed ai-reports ai-policies 2>/dev/null || true
                         echo "✅ Directories initialized"
                         ls -la | grep -E "reports|processed|ai-"
                     '''
