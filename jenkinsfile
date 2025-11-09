@@ -344,12 +344,38 @@ pipeline {
                 script {
                     echo '🚀 Deploying application...'
                     sh """
-                        docker compose down || true
+                        # Clean up existing deployment
+                        echo "🧹 Cleaning up existing containers..."
+                        docker compose down --remove-orphans || true
+
+                        # Force remove named containers if they still exist
+                        docker rm -f postgres_db redis_cache pgadmin 2>/dev/null || true
+
+                        # Clean up any networks from previous runs
+                        docker network prune -f || true
+
+                        # Pull latest image
+                        echo "📥 Pulling latest image..."
                         docker pull ${IMAGE_NAME}:latest
+
+                        # Start services
+                        echo "🚀 Starting services..."
                         docker compose up -d
+
+                        # Wait for services to be healthy
                         sleep 10
+
+                        # Show running containers
+                        echo "📊 Running containers:"
                         docker compose ps
-                        echo "✅ Deployment completed"
+
+                        # Verify services are running
+                        if docker compose ps | grep -q "Up"; then
+                            echo "✅ Deployment completed successfully"
+                        else
+                            echo "⚠️  Warning: Some services may not be running"
+                            docker compose logs --tail=50
+                        fi
                     """
                 }
             }
