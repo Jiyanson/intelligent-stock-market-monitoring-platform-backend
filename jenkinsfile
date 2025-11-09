@@ -1,29 +1,37 @@
 pipeline {
     agent any
-    
+
     environment {
         // Docker Hub credentials
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_USERNAME = 'michoc'
         IMAGE_NAME = "${DOCKER_USERNAME}/stock-market-platform"
         DOCKER_CREDENTIALS_ID = '2709ba15-3bf5-42b4-a41e-e2ae435f4951'
-        
+
         // Git repository
         GIT_REPO_URL = 'https://github.com/Jiyanson/intelligent-stock-market-monitoring-platform-backend.git'
         GIT_CREDENTIALS_ID = 'github-credentials'
         GIT_BRANCH = 'main'
-        
+
         // Image tag
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        
+
         // Deployment server (optional, for remote deployment)
         DEPLOY_SERVER = 'user@your-server.com'
         DEPLOY_SERVER_CREDENTIALS_ID = 'deploy-server-ssh'
-        
-        // 🚨 NEW: Grafana variables
-        GRAFANA_URL = 'https://ayoubcpge9.grafana.net' // 👈 **CHANGE THIS**
-        GRAFANA_API_KEY_CREDENTIALS_ID = '0acea52d-149d-4dce-affc-6e88b440471e' // 👈 **CHANGE THIS** (Jenkins Secret Text)
-        GRAFANA_DASHBOARD_ID = '1' // 👈 **CHANGE THIS** (The ID of your target dashboard)
+
+        // Grafana variables
+        GRAFANA_URL = 'https://ayoubcpge9.grafana.net'
+        GRAFANA_API_KEY_CREDENTIALS_ID = '0acea52d-149d-4dce-affc-6e88b440471e'
+        GRAFANA_DASHBOARD_ID = '1'
+
+        // HuggingFace API for AI Security Policy Generation
+        HF_TOKEN_CREDENTIALS_ID = 'huggingface-token' // Jenkins Secret Text credential
+
+        // Report directories
+        REPORTS_DIR = 'reports'
+        PROCESSED_DIR = 'processed'
+        AI_POLICIES_DIR = 'ai-policies'
     }
     
     stages {
@@ -35,7 +43,71 @@ pipeline {
                 }
             }
         }
-        
+
+        stage('Prepare Directories') {
+            steps {
+                echo '📁 Creating report directories...'
+                sh """
+                    mkdir -p ${REPORTS_DIR}
+                    mkdir -p ${PROCESSED_DIR}
+                    mkdir -p ${AI_POLICIES_DIR}
+                """
+            }
+        }
+
+        stage('Gitleaks - Secrets Scanning') {
+            steps {
+                script {
+                    echo '🔍 Running Gitleaks for secrets detection...'
+                    sh """
+                        docker run --rm -v \${PWD}:/workspace \\
+                            zricethezav/gitleaks:latest \\
+                            detect --source /workspace \\
+                            --report-path /workspace/${REPORTS_DIR}/gitleaks-report.json \\
+                            --report-format json \\
+                            --no-git || echo "Gitleaks scan completed (findings may exist)"
+                    """
+                }
+            }
+        }
+
+        stage('Semgrep - SAST') {
+            steps {
+                script {
+                    echo '🔍 Running Semgrep SAST scan...'
+                    sh """
+                        docker run --rm -v \${PWD}:/src \\
+                            returntocorp/semgrep \\
+                            scan --config=p/python \\
+                            --json --output=/src/${REPORTS_DIR}/semgrep-report.json \\
+                            /src || echo "Semgrep scan completed (findings may exist)"
+                    """
+                }
+            }
+        }
+
+        stage('Dependency-Check - SCA') {
+            steps {
+                script {
+                    echo '🔍 Running OWASP Dependency-Check for SCA...'
+                    sh """
+                        docker run --rm -v \${PWD}:/src \\
+                            -v \${HOME}/.m2:/usr/share/dependency-check/data \\
+                            owasp/dependency-check:latest \\
+                            --scan /src \\
+                            --format JSON \\
+                            --format HTML \\
+                            --out /src/${REPORTS_DIR} \\
+                            --project "Stock Market Platform" || echo "Dependency-Check scan completed (findings may exist)"
+
+                        # Rename output files to match expected names
+                        mv ${REPORTS_DIR}/dependency-check-report.json ${REPORTS_DIR}/dependency-check-report.json 2>/dev/null || true
+                        mv ${REPORTS_DIR}/dependency-check-report.html ${REPORTS_DIR}/dependency-check-report.html 2>/dev/null || true
+                    """
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -47,7 +119,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Run Tests') {
             steps {
                 script {
@@ -84,17 +156,29 @@ pipeline {
             }
         }
         
-        stage('Security Scan') {
+        stage('Trivy - Container Image Scan') {
             steps {
                 script {
-                    echo '🔒 Running security scan with Trivy...'
+                    echo '🔒 Running Trivy container image scan...'
                     sh """
-                        if ! command -v trivy >/dev/null 2>&1; then
-                            echo "Trivy not installed, skipping security scan"
-                        else
-                            echo "Running Trivy security scan..."
-                            trivy image --severity HIGH,CRITICAL --exit-code 1 --no-progress ${IMAGE_NAME}:${IMAGE_TAG} || true
-                        fi
+                        # Generate JSON report
+                        docker run --rm \\
+                            -v /var/run/docker.sock:/var/run/docker.sock \\
+                            -v \${PWD}/${REPORTS_DIR}:/reports \\
+                            aquasec/trivy:latest \\
+                            image --format json \\
+                            --output /reports/trivy-report.json \\
+                            ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy scan completed (vulnerabilities may exist)"
+
+                        # Generate HTML report
+                        docker run --rm \\
+                            -v /var/run/docker.sock:/var/run/docker.sock \\
+                            -v \${PWD}/${REPORTS_DIR}:/reports \\
+                            aquasec/trivy:latest \\
+                            image --format template \\
+                            --template '@contrib/html.tpl' \\
+                            --output /reports/trivy-report.html \\
+                            ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy HTML report generation completed"
                     """
                 }
             }
@@ -146,9 +230,108 @@ pipeline {
                 }
             }
         }
-        
-        // 🚨 NEW: Grafaana Notification Stage
-        stage('Grafaana Notification') {
+
+        stage('OWASP ZAP - DAST') {
+            steps {
+                script {
+                    echo '🔍 Running OWASP ZAP DAST scan...'
+                    sh """
+                        # Try FastAPI on port 8000, fallback to nginx on 8001
+                        TARGET_URL="http://host.docker.internal:8000"
+
+                        # Check if FastAPI is accessible
+                        if ! curl -f \${TARGET_URL}/api/v1/finance/health 2>/dev/null; then
+                            echo "FastAPI not accessible on 8000, trying nginx on 8001..."
+                            TARGET_URL="http://host.docker.internal:8001"
+                        fi
+
+                        echo "Running ZAP baseline scan against \${TARGET_URL}..."
+
+                        docker run --rm \\
+                            --add-host=host.docker.internal:host-gateway \\
+                            -v \${PWD}/${REPORTS_DIR}:/zap/wrk:rw \\
+                            -t ghcr.io/zaproxy/zaproxy:stable \\
+                            zap-baseline.py \\
+                            -t \${TARGET_URL} \\
+                            -J zap-report.json \\
+                            -r zap-report.html \\
+                            -I || echo "ZAP scan completed (findings may exist)"
+                    """
+                }
+            }
+        }
+
+        stage('Normalize Reports') {
+            steps {
+                script {
+                    echo '📊 Normalizing security reports...'
+                    sh """
+                        # Check if the normalization script exists
+                        if [ -f "${REPORTS_DIR}/process_vulnerabilities.py" ]; then
+                            docker run --rm \\
+                                -v \${PWD}/${REPORTS_DIR}:/reports \\
+                                -v \${PWD}/${PROCESSED_DIR}:/processed \\
+                                python:3.11-slim \\
+                                sh -c "pip install -q jq && python /reports/process_vulnerabilities.py" \\
+                                || echo "Report normalization completed with warnings"
+                        else
+                            echo "⚠️ Normalization script not found at ${REPORTS_DIR}/process_vulnerabilities.py"
+                            echo "Creating placeholder normalized report..."
+                            echo '{"vulnerabilities": [], "summary": "Normalization script not found"}' > ${PROCESSED_DIR}/normalized_vulnerabilities.json
+                        fi
+                    """
+                }
+            }
+        }
+
+        stage('AI Security Policy Generation') {
+            steps {
+                script {
+                    echo '🤖 Generating AI-based security policies...'
+                    // Check if HF_TOKEN credential exists, otherwise skip
+                    try {
+                        withCredentials([string(credentialsId: HF_TOKEN_CREDENTIALS_ID, variable: 'HF_TOKEN')]) {
+                            sh """
+                                # Check if the AI integration script exists
+                                if [ -f "real_llm_integration.py" ]; then
+                                    docker run --rm \\
+                                        -e HF_TOKEN=\${HF_TOKEN} \\
+                                        -v \${PWD}:/workspace \\
+                                        -v \${PWD}/${PROCESSED_DIR}:/processed \\
+                                        -v \${PWD}/${AI_POLICIES_DIR}:/ai-policies \\
+                                        python:3.11-slim \\
+                                        sh -c "cd /workspace && pip install -q requests && python real_llm_integration.py" \\
+                                        || echo "AI policy generation completed with warnings"
+                                else
+                                    echo "⚠️ AI integration script 'real_llm_integration.py' not found"
+                                    echo "Creating placeholder AI policy..."
+                                    mkdir -p ${AI_POLICIES_DIR}
+                                    echo '{"policy": "AI integration script not found", "recommendations": []}' > ${AI_POLICIES_DIR}/llm_generated_policy.json
+                                fi
+                            """
+                        }
+                    } catch (Exception e) {
+                        echo "⚠️ HuggingFace token credential not configured. Skipping AI policy generation."
+                        echo "To enable, add a Jenkins Secret Text credential with ID: ${HF_TOKEN_CREDENTIALS_ID}"
+                        sh """
+                            mkdir -p ${AI_POLICIES_DIR}
+                            echo '{"policy": "HF_TOKEN not configured", "recommendations": []}' > ${AI_POLICIES_DIR}/llm_generated_policy.json
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                echo '📦 Archiving security reports...'
+                archiveArtifacts artifacts: "${REPORTS_DIR}/**/*.json,${REPORTS_DIR}/**/*.html,${PROCESSED_DIR}/**/*.json,${AI_POLICIES_DIR}/**/*.json",
+                                 allowEmptyArchive: true,
+                                 fingerprint: true
+            }
+        }
+
+        stage('Grafana Notification') {
             steps {
                 script {
                     echo '📢 Sending deployment annotation to Grafana...'
