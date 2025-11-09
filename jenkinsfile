@@ -287,32 +287,41 @@ pipeline {
         stage('AI Security Policy Generation') {
             steps {
                 script {
-                    echo '🤖 Generating AI-based security policies...'
+                    echo '🤖 Generating AI-based security policies and HTML reports...'
                     // Check if HF_TOKEN credential exists, otherwise skip
                     try {
                         withCredentials([string(credentialsId: HF_TOKEN_CREDENTIALS_ID, variable: 'HF_TOKEN')]) {
                             sh """
-                                # Check if the AI integration script exists
-                                if [ -f "real_llm_integration.py" ]; then
+                                # Check if the AI integration scripts exist
+                                if [ -f "real_llm_integration.py" ] && [ -f "llm_integration.py" ] && [ -f "html_report_generator.py" ]; then
+                                    echo "✅ All AI security scripts found"
+
+                                    # Run AI security analysis and report generation
                                     docker run --rm \\
                                         -e HF_TOKEN=\${HF_TOKEN} \\
                                         -v \${PWD}:/workspace \\
-                                        -v \${PWD}/${PROCESSED_DIR}:/processed \\
-                                        -v \${PWD}/${AI_POLICIES_DIR}:/ai-policies \\
+                                        -w /workspace \\
                                         python:3.11-slim \\
-                                        sh -c "cd /workspace && pip install -q requests && python real_llm_integration.py" \\
-                                        || echo "AI policy generation completed with warnings"
+                                        sh -c "pip install -q -r requirements-security.txt && python3 real_llm_integration.py" \\
+                                        || echo "⚠️ AI policy generation completed with warnings"
+
+                                    echo "✅ AI-powered security analysis complete!"
+                                    echo "📊 Generated reports:"
+                                    ls -lh ${REPORTS_DIR}/*.html 2>/dev/null || echo "No HTML reports found"
+                                    ls -lh ${AI_POLICIES_DIR}/*.json 2>/dev/null || echo "No AI policies found"
                                 else
-                                    echo "⚠️ AI integration script 'real_llm_integration.py' not found"
+                                    echo "⚠️ AI integration scripts not found"
+                                    echo "Required files: real_llm_integration.py, llm_integration.py, html_report_generator.py"
                                     echo "Creating placeholder AI policy..."
                                     mkdir -p ${AI_POLICIES_DIR}
-                                    echo '{"policy": "AI integration script not found", "recommendations": []}' > ${AI_POLICIES_DIR}/llm_generated_policy.json
+                                    echo '{"policy": "AI integration scripts not found", "recommendations": []}' > ${AI_POLICIES_DIR}/llm_generated_policy.json
                                 fi
                             """
                         }
                     } catch (Exception e) {
                         echo "⚠️ HuggingFace token credential not configured. Skipping AI policy generation."
                         echo "To enable, add a Jenkins Secret Text credential with ID: ${HF_TOKEN_CREDENTIALS_ID}"
+                        echo "Get your token from: https://huggingface.co/settings/tokens"
                         sh """
                             mkdir -p ${AI_POLICIES_DIR}
                             echo '{"policy": "HF_TOKEN not configured", "recommendations": []}' > ${AI_POLICIES_DIR}/llm_generated_policy.json
@@ -324,10 +333,15 @@ pipeline {
 
         stage('Archive Reports') {
             steps {
-                echo '📦 Archiving security reports...'
+                echo '📦 Archiving security reports and AI-generated artifacts...'
                 archiveArtifacts artifacts: "${REPORTS_DIR}/**/*.json,${REPORTS_DIR}/**/*.html,${PROCESSED_DIR}/**/*.json,${AI_POLICIES_DIR}/**/*.json",
                                  allowEmptyArchive: true,
                                  fingerprint: true
+                echo '✅ Archived artifacts:'
+                echo '   - Security scan reports (JSON/HTML)'
+                echo '   - Normalized vulnerability data'
+                echo '   - AI-generated policies and playbooks'
+                echo '   - Comprehensive/Executive/Technical HTML reports'
             }
         }
 
