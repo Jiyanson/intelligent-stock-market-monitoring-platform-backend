@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Python deps
-COPY requirements.txt dev-requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt -r dev-requirements.txt
+COPY requirements.txt dev-requirements.txt requirements-security.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r dev-requirements.txt -r requirements-security.txt
 
 # App code
 COPY . .
