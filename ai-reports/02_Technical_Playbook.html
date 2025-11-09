@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Technical Remediation Playbook — Build #LOCAL</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+ body{font:14px system-ui;margin:24px;color:#1f2328}
+ h1{font-size:20px;margin:0 0 8px}
+ h2{font-size:16px;margin:18px 0 8px}
+ .block{border:1px solid #e0e4e8;border-radius:10px;padding:14px;margin:12px 0}
+ code{background:#f6f8fa;padding:2px 6px;border-radius:4px;font-size:13px}
+ pre{background:#f6f8fa;padding:12px;border-radius:6px;overflow-x:auto}
+ .sev{padding:2px 8px;border-radius:6px;border:1px solid #e3e6ea;margin-right:6px}
+ .critical{background:#ffe8e6;color:#a40000}
+ .high{background:#fff0d6;color:#8a4b00}
+ table{width:100%;border-collapse:collapse;margin:8px 0}
+ th,td{border:1px solid #e6e9ed;padding:8px;text-align:left}
+</style>
+</head>
+<body>
+<h1>Technical Remediation Playbook <small>Build #LOCAL</small></h1>
+
+<div class="block">
+  <strong>📊 Vulnerability Summary</strong>
+  <ul>
+    <li>Total Vulnerabilities: 4</li>
+    <li>Container/OS Issues: 1</li>
+    <li>Dependency Issues: 0</li>
+    <li>Code Issues: 1</li>
+    <li>Risk Level: <span class="sev critical">CRITICAL</span></li>
+  </ul>
+</div>
+
+<h2>🐳 Container Security Fixes</h2>
+<div class="block">
+  <p><strong>Issue:</strong> 1 vulnerabilities in container base image and OS packages</p>
+
+  <p><strong>Action:</strong></p>
+  <pre>
+# 1. Update Dockerfile base image
+FROM python:3.11-slim  # Use latest stable version
+
+# 2. Update OS packages
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Scan image after rebuild
+docker build -t app:latest .
+trivy image --severity CRITICAL,HIGH app:latest
+  </pre>
+
+  <p><strong>Priority Packages to Update:</strong></p>
+  <ul>
+    <li><code>openssl</code></li>
+  </ul>
+</div>
+
+<h2>📦 Dependency Updates</h2>
+<div class="block">
+  <p><strong>Issue:</strong> 0 vulnerable dependencies detected</p>
+
+  <p><strong>Action:</strong></p>
+  <pre>
+# 1. Update requirements.txt with patched versions
+# Check for updates:
+pip list --outdated
+
+# 2. Update specific packages with known CVEs
+pip install --upgrade requests urllib3 cryptography
+
+# 3. Regenerate lock file
+pip freeze > requirements.txt
+
+# 4. Re-scan dependencies
+safety check
+dependency-check --project "App" --scan .
+  </pre>
+</div>
+
+<h2>💻 Code Security Fixes</h2>
+<div class="block">
+  <p><strong>Issue:</strong> 1 code-level vulnerabilities found by SAST</p>
+
+  <p><strong>Common Fixes:</strong></p>
+  <ul>
+    <li>Input Validation: Sanitize all user inputs before processing</li>
+    <li>SQL Injection: Use parameterized queries or ORM</li>
+    <li>XSS Prevention: Escape output, set CSP headers</li>
+    <li>Authentication: Enforce strong password policies, use MFA</li>
+    <li>Session Management: Set HttpOnly, Secure, SameSite flags on cookies</li>
+  </ul>
+
+  <pre>
+# Example: Fix cookie security
+response.set_cookie(
+    "session",
+    value=session_id,
+    httponly=True,  # Prevent XSS access
+    secure=True,    # HTTPS only
+    samesite="Lax"  # CSRF protection
+)
+  </pre>
+</div>
+
+<h2>🔄 Verification Steps</h2>
+<div class="block">
+  <ol>
+    <li>Apply fixes and commit changes</li>
+    <li>Trigger CI/CD pipeline</li>
+    <li>Review scan results - expect reduced vulnerability count</li>
+    <li>Run regression tests</li>
+    <li>Deploy to staging for validation</li>
+    <li>Update security baseline documentation</li>
+  </ol>
+</div>
+
+</body>
+</html>
