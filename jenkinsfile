@@ -346,13 +346,34 @@ pipeline {
                     sh """
                         # Clean up existing deployment
                         echo "🧹 Cleaning up existing containers..."
-                        docker compose down --remove-orphans || true
+                        docker compose down --remove-orphans --volumes || true
 
                         # Force remove named containers if they still exist
                         docker rm -f postgres_db redis_cache pgadmin 2>/dev/null || true
 
+                        # Force stop and remove any containers from this project
+                        docker ps -a --filter "name=devsecops2" --format "{{.Names}}" | xargs -r docker rm -f 2>/dev/null || true
+
                         # Clean up any networks from previous runs
                         docker network prune -f || true
+
+                        # Wait for ports to be released
+                        echo "⏳ Waiting for ports to be released..."
+                        sleep 3
+
+                        # Check if critical ports are free (8000, 5432, 6379)
+                        for port in 8000 5432 6379; do
+                            if lsof -i :\${port} >/dev/null 2>&1; then
+                                echo "⚠️  Warning: Port \${port} is still in use"
+                                lsof -i :\${port} || true
+                                echo "Attempting to free port \${port}..."
+                                # Kill any process using the port
+                                lsof -ti :\${port} | xargs -r kill -9 2>/dev/null || true
+                                sleep 2
+                            else
+                                echo "✅ Port \${port} is free"
+                            fi
+                        done
 
                         # Pull latest image
                         echo "📥 Pulling latest image..."
@@ -363,6 +384,7 @@ pipeline {
                         docker compose up -d
 
                         # Wait for services to be healthy
+                        echo "⏳ Waiting for services to start..."
                         sleep 10
 
                         # Show running containers
@@ -372,8 +394,19 @@ pipeline {
                         # Verify services are running
                         if docker compose ps | grep -q "Up"; then
                             echo "✅ Deployment completed successfully"
+
+                            # Test connectivity
+                            echo ""
+                            echo "🔍 Testing service connectivity..."
+                            if curl -f -s http://localhost:8000/health >/dev/null 2>&1 || curl -f -s http://localhost:8000/docs >/dev/null 2>&1; then
+                                echo "✅ Web service is responding"
+                            else
+                                echo "⚠️  Web service may not be ready yet (this is normal during startup)"
+                            fi
                         else
                             echo "⚠️  Warning: Some services may not be running"
+                            echo ""
+                            echo "📋 Service logs:"
                             docker compose logs --tail=50
                         fi
                     """
