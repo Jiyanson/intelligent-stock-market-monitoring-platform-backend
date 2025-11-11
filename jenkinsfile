@@ -96,20 +96,30 @@ pipeline {
                 stage('SCA - Dependency Check') {
                     steps {
                         script {
-                            echo '📦 Running OWASP Dependency-Check...'
+                            echo '📦 Running OWASP Dependency-Check (optimized)...'
                             sh '''
-                                docker run --rm -v ${PWD}:/src \\
+                                # Only scan dependency files for faster execution
+                                mkdir -p /tmp/dep-scan-${BUILD_NUMBER}
+                                cp requirements*.txt /tmp/dep-scan-${BUILD_NUMBER}/ 2>/dev/null || true
+
+                                docker run --rm -v /tmp/dep-scan-${BUILD_NUMBER}:/src \\
                                     -v ${PWD}/reports/dependency-check-data:/usr/share/dependency-check/data \\
                                     owasp/dependency-check:latest \\
                                     --scan /src \\
                                     --format JSON --format HTML \\
-                                    --out /src/reports \\
-                                    --project "Stock Market Platform" || echo "Dependency-Check completed"
+                                    --out /tmp/dep-scan-${BUILD_NUMBER}/reports \\
+                                    --project "Stock Market Platform" \\
+                                    --failOnCVSS 0 || echo "Dependency-Check completed"
+
+                                # Copy reports back
+                                mkdir -p ${PWD}/reports
+                                cp /tmp/dep-scan-${BUILD_NUMBER}/reports/* ${PWD}/reports/ 2>/dev/null || true
+                                rm -rf /tmp/dep-scan-${BUILD_NUMBER}
 
                                 if [ ! -f reports/dependency-check-report.json ]; then
                                     echo '{"dependencies":[]}' > reports/dependency-check-report.json
                                 fi
-                                echo "✅ Dependency check completed"
+                                echo "✅ Dependency check completed (scanned Python dependencies only)"
                             '''
                         }
                     }
@@ -228,17 +238,41 @@ pipeline {
                 stage('Container Security Scan') {
                     steps {
                         script {
-                            echo '🔒 Scanning built container...'
+                            echo '🔒 Scanning built container and dependencies...'
                             sh """
+                                # Scan 1: Container image vulnerabilities
+                                echo "📦 Scanning Docker image for OS and base layer vulnerabilities..."
                                 docker run --rm \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
                                     -v \${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
                                     image --format json \\
-                                    --output /reports/trivy-report.json \\
-                                    ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy scan completed"
+                                    --output /reports/trivy-image-report.json \\
+                                    ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy image scan completed"
 
-                                # Also generate HTML report
+                                # Scan 2: Filesystem scan for language-specific vulnerabilities (Python packages, etc.)
+                                echo "🐍 Scanning filesystem for Python package vulnerabilities..."
+                                docker run --rm \\
+                                    -v \${PWD}:/workspace \\
+                                    -v \${PWD}/reports:/reports \\
+                                    aquasec/trivy:latest \\
+                                    fs --format json \\
+                                    --output /reports/trivy-fs-report.json \\
+                                    --scanners vuln \\
+                                    /workspace || echo "Trivy filesystem scan completed"
+
+                                # Merge both reports into main trivy-report.json
+                                python3 -c "
+import json
+import os
+image_data = json.load(open('reports/trivy-image-report.json', 'r')) if os.path.exists('reports/trivy-image-report.json') else {'Results': []}
+fs_data = json.load(open('reports/trivy-fs-report.json', 'r')) if os.path.exists('reports/trivy-fs-report.json') else {'Results': []}
+merged = {'Results': image_data.get('Results', []) + fs_data.get('Results', [])}
+json.dump(merged, open('reports/trivy-report.json', 'w'), indent=2)
+print('Merged Trivy reports')
+" 2>/dev/null || cp reports/trivy-image-report.json reports/trivy-report.json 2>/dev/null || echo '{"Results":[]}' > reports/trivy-report.json
+
+                                # Generate HTML report from merged data
                                 docker run --rm \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
                                     -v \${PWD}/reports:/reports \\
@@ -248,7 +282,13 @@ pipeline {
                                     --output /reports/trivy-report.html \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || true
 
-                                echo "✅ Container security scan completed"
+                                # Count vulnerabilities
+                                if [ -f reports/trivy-report.json ]; then
+                                    VULN_COUNT=\$(python3 -c "import json; data=json.load(open('reports/trivy-report.json')); vulns=sum(len(r.get('Vulnerabilities', [])) for r in data.get('Results', [])); print(vulns)" 2>/dev/null || echo "0")
+                                    echo "✅ Container security scan completed - Found \${VULN_COUNT} vulnerabilities"
+                                else
+                                    echo "✅ Container security scan completed"
+                                fi
                             """
                         }
                     }
