@@ -297,7 +297,8 @@ class VulnerabilityNormalizer:
             'gitleaks-report.json': self.normalize_gitleaks,
             'semgrep-report.json': self.normalize_semgrep,
             'trivy-dependencies.json': self.normalize_trivy,  # Fast Trivy SCA scan
-            'trivy-report.json': self.normalize_trivy,
+            'trivy-image-scan.json': self.normalize_trivy,    # Container image scan
+            'trivy-report.json': self.normalize_trivy,         # Legacy/fallback
             'zap-report.json': self.normalize_zap
         }
 
