@@ -125,15 +125,29 @@ pipeline {
                 stage('Build AI Processor Image') {
                     steps {
                         script {
-                            echo "🤖 Building AI Processor image: ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}"
+                            echo "🤖 Preparing AI Processor image: ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}"
                             sh """
-                                # Create Dockerfile for AI Processor if it doesn't exist
-                                if [ ! -f Dockerfile.ai-processor ]; then
-                                    cat > Dockerfile.ai-processor <<'EOF'
+                                # Try to pull existing image from registry (much faster than rebuilding)
+                                echo "📥 Attempting to pull AI Processor image from registry..."
+                                if docker pull ${AI_PROCESSOR_IMAGE}:latest 2>/dev/null; then
+                                    echo "✅ Using cached AI Processor image from registry"
+                                    docker tag ${AI_PROCESSOR_IMAGE}:latest ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
+                                else
+                                    echo "⚠️  No cached image found, building AI Processor image (this may take 5-10 minutes)..."
+
+                                    # Create Dockerfile for AI Processor if it doesn't exist
+                                    if [ ! -f Dockerfile.ai-processor ]; then
+                                        cat > Dockerfile.ai-processor <<'EOF'
 FROM python:3.11-slim
 
-# Install AI/ML packages
-RUN pip install --no-cache-dir \\
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \\
+    build-essential \\
+    && rm -rf /var/lib/apt/lists/*
+
+# Install AI/ML packages with pip cache
+RUN --mount=type=cache,target=/root/.cache/pip \\
+    pip install --no-cache-dir \\
     transformers>=4.35.0 \\
     torch>=2.1.0 \\
     accelerate>=0.25.0 \\
@@ -155,12 +169,14 @@ ENV TRANSFORMERS_CACHE=/tmp/transformers_cache
 
 CMD ["python", "--version"]
 EOF
-                                fi
+                                    fi
 
-                                docker build -f Dockerfile.ai-processor \\
-                                    -t ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} .
-                                docker tag ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} ${AI_PROCESSOR_IMAGE}:latest
-                                echo "✅ AI Processor image built successfully"
+                                    # Build with BuildKit for better caching
+                                    DOCKER_BUILDKIT=1 docker build -f Dockerfile.ai-processor \\
+                                        -t ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} .
+                                    docker tag ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} ${AI_PROCESSOR_IMAGE}:latest
+                                    echo "✅ AI Processor image built successfully"
+                                fi
                             """
                         }
                     }
