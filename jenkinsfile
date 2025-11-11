@@ -120,21 +120,28 @@ pipeline {
             }
         }
 
-        stage('Pull AI Processor Image') {
+        stage('Prepare AI Processor Image') {
             steps {
                 script {
-                    echo "🤖 Pulling AI Processor image from registry..."
+                    echo "🤖 Preparing AI Processor image..."
                     sh """
-                        # Pull pre-built AI processor image (built once and cached)
-                        if docker pull ${AI_PROCESSOR_IMAGE}:latest; then
-                            echo "✅ AI Processor image pulled successfully"
+                        # Try to pull pre-built image from registry first (fast path)
+                        echo "📥 Attempting to pull AI Processor image from registry..."
+                        if docker pull ${AI_PROCESSOR_IMAGE}:latest 2>/dev/null; then
+                            echo "✅ Using cached AI Processor image from registry (~10 seconds)"
                             docker tag ${AI_PROCESSOR_IMAGE}:latest ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
                         else
-                            echo "⚠️  AI Processor image not found in registry!"
-                            echo "📝 To build it manually, run:"
-                            echo "   docker build -f Dockerfile.ai-processor -t ${AI_PROCESSOR_IMAGE}:latest ."
-                            echo "   docker push ${AI_PROCESSOR_IMAGE}:latest"
-                            exit 1
+                            echo "⚠️  No cached image found in registry"
+                            echo "🔨 Building AI Processor image (first run only, takes ~5-10 minutes)..."
+                            echo "💡 This image will be cached for future pipeline runs"
+
+                            # Build the image with BuildKit for better caching
+                            DOCKER_BUILDKIT=1 docker build -f Dockerfile.ai-processor \\
+                                -t ${AI_PROCESSOR_IMAGE}:latest \\
+                                -t ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} .
+
+                            echo "✅ AI Processor image built successfully"
+                            echo "📤 Image will be pushed to registry in Phase 8 for future runs"
                         fi
                     """
                 }
@@ -520,7 +527,7 @@ print(f"📊 Based on {vuln_data.get(\"risk_metrics\", {}).get(\"total\", 0)} vu
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    echo '🚀 Pushing application image to Docker Hub...'
+                    echo '🚀 Pushing images to Docker Hub...'
                     withCredentials([usernamePassword(
                         credentialsId: DOCKER_CREDENTIALS_ID,
                         usernameVariable: 'DOCKER_USER',
@@ -528,10 +535,19 @@ print(f"📊 Based on {vuln_data.get(\"risk_metrics\", {}).get(\"total\", 0)} vu
                     )]) {
                         sh """
                             echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+
+                            # Push main application image
+                            echo "📤 Pushing main application image..."
                             docker push ${IMAGE_NAME}:${IMAGE_TAG}
                             docker push ${IMAGE_NAME}:latest
+
+                            # Push AI processor image (for caching in future runs)
+                            echo "📤 Pushing AI processor image for future caching..."
+                            docker push ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
+                            docker push ${AI_PROCESSOR_IMAGE}:latest
+
                             docker logout
-                            echo "✅ Application images pushed to registry"
+                            echo "✅ All images pushed to registry"
                         """
                     }
                 }
