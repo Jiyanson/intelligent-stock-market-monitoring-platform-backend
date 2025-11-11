@@ -40,8 +40,15 @@ pipeline {
                     echo '📁 Creating report directories...'
                     sh '''
                         mkdir -p reports processed ai-reports ai-policies
-                        chmod -R 755 reports processed ai-reports ai-policies 2>/dev/null || true
-                        echo "✅ Directories initialized"
+                        chmod -R 777 reports processed ai-reports ai-policies 2>/dev/null || true
+
+                        # Store Jenkins user/group IDs for Docker containers
+                        export JENKINS_UID=$(id -u)
+                        export JENKINS_GID=$(id -g)
+                        echo "JENKINS_UID=${JENKINS_UID}" > .env.jenkins
+                        echo "JENKINS_GID=${JENKINS_GID}" >> .env.jenkins
+
+                        echo "✅ Directories initialized (Jenkins UID:${JENKINS_UID} GID:${JENKINS_GID})"
                         ls -la | grep -E "reports|processed|ai-"
                     '''
                 }
@@ -154,6 +161,19 @@ pipeline {
             }
         }
 
+        stage('Fix Security Scan Permissions') {
+            steps {
+                script {
+                    echo '🔧 Fixing permissions on security scan reports...'
+                    sh '''
+                        # Fix permissions on all report files created by Docker containers
+                        sudo chown -R jenkins:jenkins reports/ 2>/dev/null || chmod -R 666 reports/* 2>/dev/null || true
+                        echo "✅ Permissions fixed"
+                    '''
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -250,6 +270,9 @@ pipeline {
                                     --output /reports/trivy-image-report.json \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy image scan completed"
 
+                                # Fix permissions on image report
+                                sudo chown -R jenkins:jenkins reports/ 2>/dev/null || chmod -R 666 reports/*.json 2>/dev/null || true
+
                                 # Scan 2: Filesystem scan for language-specific vulnerabilities (Python packages, etc.)
                                 echo "🐍 Scanning filesystem for Python package vulnerabilities..."
                                 docker run --rm \\
@@ -260,6 +283,9 @@ pipeline {
                                     --output /reports/trivy-fs-report.json \\
                                     --scanners vuln \\
                                     /workspace || echo "Trivy filesystem scan completed"
+
+                                # Fix permissions on report files created by Docker (which runs as root)
+                                sudo chown -R jenkins:jenkins reports/ 2>/dev/null || chmod -R 666 reports/*.json 2>/dev/null || true
 
                                 # Merge both reports into main trivy-report.json
                                 python3 -c "
