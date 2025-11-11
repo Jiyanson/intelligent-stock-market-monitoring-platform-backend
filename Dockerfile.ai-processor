@@ -19,9 +19,9 @@ RUN pip install --no-cache-dir \
 # Set working directory
 WORKDIR /app
 
-# Copy AI analysis scripts
-COPY generate_ai_reports.py ./
-COPY process_vulnerabilities.py ./
+# Copy Python scripts for AI analysis and report generation
+COPY *.py ./
+COPY reports/process_vulnerabilities.py ./
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
