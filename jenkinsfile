@@ -40,8 +40,8 @@ pipeline {
                     echo '📁 Creating report directories...'
                     sh '''
                         mkdir -p reports processed ai-reports ai-policies
-                        chmod -R 755 reports processed ai-reports ai-policies 2>/dev/null || true
-                        echo "✅ Directories initialized"
+                        chmod -R 777 reports processed ai-reports ai-policies 2>/dev/null || true
+                        echo "✅ Directories initialized with full write permissions"
                         ls -la | grep -E "reports|processed|ai-"
                     '''
                 }
@@ -145,6 +145,20 @@ pipeline {
             }
         }
 
+        stage('Fix Report Permissions') {
+            steps {
+                script {
+                    echo '🔧 Fixing permissions on scan reports...'
+                    sh '''
+                        # Fix ownership/permissions of reports created by Docker containers
+                        chmod -R 666 reports/* 2>/dev/null || true
+                        ls -lh reports/ | head -10
+                        echo "✅ Report permissions fixed"
+                    '''
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -236,8 +250,11 @@ pipeline {
                                     -v \${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
                                     image --format json \\
-                                    --output /reports/trivy-report.json \\
+                                    --output /reports/trivy-image-scan.json \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy scan completed"
+
+                                # Fix permissions on report files
+                                chmod 666 reports/*.json 2>/dev/null || true
 
                                 # Also generate HTML report
                                 docker run --rm \\
@@ -249,7 +266,15 @@ pipeline {
                                     --output /reports/trivy-report.html \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || true
 
-                                echo "✅ Container security scan completed"
+                                chmod 666 reports/*.html 2>/dev/null || true
+
+                                # Count vulnerabilities found
+                                if [ -f reports/trivy-image-scan.json ]; then
+                                    VULN_COUNT=\$(python3 -c "import json; data=json.load(open('reports/trivy-image-scan.json')); print(sum(len(r.get('Vulnerabilities', [])) for r in data.get('Results', [])))" 2>/dev/null || echo "0")
+                                    echo "✅ Container scan found \${VULN_COUNT} vulnerabilities"
+                                else
+                                    echo "⚠️ No container scan report generated"
+                                fi
                             """
                         }
                     }
@@ -262,13 +287,18 @@ pipeline {
                 script {
                     echo '🧾 Normalizing all security scan results...'
                     sh '''
+                        echo "📁 Reports found:"
+                        ls -lh reports/*.json 2>/dev/null || echo "No JSON reports found"
+
                         cd reports
                         python3 process_vulnerabilities.py || echo "Using available reports"
                         cd ..
 
                         if [ -f processed/normalized_vulnerabilities.json ]; then
-                            VULN_COUNT=$(jq '.risk_metrics.total // length' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
-                            echo "✅ Normalized $VULN_COUNT vulnerabilities"
+                            VULN_COUNT=$(jq '.risk_metrics.total // 0' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
+                            CRITICAL=$(jq '.risk_metrics.critical // 0' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
+                            HIGH=$(jq '.risk_metrics.high // 0' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
+                            echo "✅ Normalized $VULN_COUNT vulnerabilities (Critical: $CRITICAL, High: $HIGH)"
                         else
                             echo "Creating placeholder normalized data..."
                             echo '{"vulnerabilities":[],"risk_metrics":{"total":0}}' > processed/normalized_vulnerabilities.json
