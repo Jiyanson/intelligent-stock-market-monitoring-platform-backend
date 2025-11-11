@@ -40,15 +40,8 @@ pipeline {
                     echo '📁 Creating report directories...'
                     sh '''
                         mkdir -p reports processed ai-reports ai-policies
-                        chmod -R 777 reports processed ai-reports ai-policies 2>/dev/null || true
-
-                        # Store Jenkins user/group IDs for Docker containers
-                        export JENKINS_UID=$(id -u)
-                        export JENKINS_GID=$(id -g)
-                        echo "JENKINS_UID=${JENKINS_UID}" > .env.jenkins
-                        echo "JENKINS_GID=${JENKINS_GID}" >> .env.jenkins
-
-                        echo "✅ Directories initialized (Jenkins UID:${JENKINS_UID} GID:${JENKINS_GID})"
+                        chmod -R 755 reports processed ai-reports ai-policies 2>/dev/null || true
+                        echo "✅ Directories initialized"
                         ls -la | grep -E "reports|processed|ai-"
                     '''
                 }
@@ -100,33 +93,24 @@ pipeline {
                     }
                 }
 
-                stage('SCA - Dependency Check') {
+                stage('SCA - Trivy Filesystem') {
                     steps {
                         script {
-                            echo '📦 Running OWASP Dependency-Check (optimized)...'
+                            echo '📦 Running Trivy dependency scan (fast SCA)...'
                             sh '''
-                                # Only scan dependency files for faster execution
-                                mkdir -p /tmp/dep-scan-${BUILD_NUMBER}
-                                cp requirements*.txt /tmp/dep-scan-${BUILD_NUMBER}/ 2>/dev/null || true
+                                docker run --rm \\
+                                    -v ${PWD}:/workspace \\
+                                    -v ${PWD}/reports:/reports \\
+                                    aquasec/trivy:latest \\
+                                    fs --format json \\
+                                    --output /reports/trivy-dependencies.json \\
+                                    --scanners vuln \\
+                                    /workspace || echo "Trivy dependency scan completed"
 
-                                docker run --rm -v /tmp/dep-scan-${BUILD_NUMBER}:/src \\
-                                    -v ${PWD}/reports/dependency-check-data:/usr/share/dependency-check/data \\
-                                    owasp/dependency-check:latest \\
-                                    --scan /src \\
-                                    --format JSON --format HTML \\
-                                    --out /tmp/dep-scan-${BUILD_NUMBER}/reports \\
-                                    --project "Stock Market Platform" \\
-                                    --failOnCVSS 0 || echo "Dependency-Check completed"
-
-                                # Copy reports back
-                                mkdir -p ${PWD}/reports
-                                cp /tmp/dep-scan-${BUILD_NUMBER}/reports/* ${PWD}/reports/ 2>/dev/null || true
-                                rm -rf /tmp/dep-scan-${BUILD_NUMBER}
-
-                                if [ ! -f reports/dependency-check-report.json ]; then
-                                    echo '{"dependencies":[]}' > reports/dependency-check-report.json
+                                if [ ! -f reports/trivy-dependencies.json ]; then
+                                    echo '{"Results":[]}' > reports/trivy-dependencies.json
                                 fi
-                                echo "✅ Dependency check completed (scanned Python dependencies only)"
+                                echo "✅ Trivy dependency scan completed (much faster than OWASP Dependency-Check)"
                             '''
                         }
                     }
@@ -157,19 +141,6 @@ pipeline {
                             '''
                         }
                     }
-                }
-            }
-        }
-
-        stage('Fix Security Scan Permissions') {
-            steps {
-                script {
-                    echo '🔧 Fixing permissions on security scan reports...'
-                    sh '''
-                        # Fix permissions on all report files created by Docker containers
-                        sudo chown -R jenkins:jenkins reports/ 2>/dev/null || chmod -R 666 reports/* 2>/dev/null || true
-                        echo "✅ Permissions fixed"
-                    '''
                 }
             }
         }
@@ -258,47 +229,17 @@ pipeline {
                 stage('Container Security Scan') {
                     steps {
                         script {
-                            echo '🔒 Scanning built container and dependencies...'
+                            echo '🔒 Scanning built container...'
                             sh """
-                                # Scan 1: Container image vulnerabilities
-                                echo "📦 Scanning Docker image for OS and base layer vulnerabilities..."
                                 docker run --rm \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
                                     -v \${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
                                     image --format json \\
-                                    --output /reports/trivy-image-report.json \\
-                                    ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy image scan completed"
+                                    --output /reports/trivy-report.json \\
+                                    ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy scan completed"
 
-                                # Fix permissions on image report
-                                sudo chown -R jenkins:jenkins reports/ 2>/dev/null || chmod -R 666 reports/*.json 2>/dev/null || true
-
-                                # Scan 2: Filesystem scan for language-specific vulnerabilities (Python packages, etc.)
-                                echo "🐍 Scanning filesystem for Python package vulnerabilities..."
-                                docker run --rm \\
-                                    -v \${PWD}:/workspace \\
-                                    -v \${PWD}/reports:/reports \\
-                                    aquasec/trivy:latest \\
-                                    fs --format json \\
-                                    --output /reports/trivy-fs-report.json \\
-                                    --scanners vuln \\
-                                    /workspace || echo "Trivy filesystem scan completed"
-
-                                # Fix permissions on report files created by Docker (which runs as root)
-                                sudo chown -R jenkins:jenkins reports/ 2>/dev/null || chmod -R 666 reports/*.json 2>/dev/null || true
-
-                                # Merge both reports into main trivy-report.json
-                                python3 -c "
-import json
-import os
-image_data = json.load(open('reports/trivy-image-report.json', 'r')) if os.path.exists('reports/trivy-image-report.json') else {'Results': []}
-fs_data = json.load(open('reports/trivy-fs-report.json', 'r')) if os.path.exists('reports/trivy-fs-report.json') else {'Results': []}
-merged = {'Results': image_data.get('Results', []) + fs_data.get('Results', [])}
-json.dump(merged, open('reports/trivy-report.json', 'w'), indent=2)
-print('Merged Trivy reports')
-" 2>/dev/null || cp reports/trivy-image-report.json reports/trivy-report.json 2>/dev/null || echo '{"Results":[]}' > reports/trivy-report.json
-
-                                # Generate HTML report from merged data
+                                # Also generate HTML report
                                 docker run --rm \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
                                     -v \${PWD}/reports:/reports \\
@@ -308,13 +249,7 @@ print('Merged Trivy reports')
                                     --output /reports/trivy-report.html \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || true
 
-                                # Count vulnerabilities
-                                if [ -f reports/trivy-report.json ]; then
-                                    VULN_COUNT=\$(python3 -c "import json; data=json.load(open('reports/trivy-report.json')); vulns=sum(len(r.get('Vulnerabilities', [])) for r in data.get('Results', [])); print(vulns)" 2>/dev/null || echo "0")
-                                    echo "✅ Container security scan completed - Found \${VULN_COUNT} vulnerabilities"
-                                else
-                                    echo "✅ Container security scan completed"
-                                fi
+                                echo "✅ Container security scan completed"
                             """
                         }
                     }
