@@ -536,10 +536,18 @@ except:
                             fi
                         done
 
-                        echo "📥 Pulling latest image..."
-                        docker pull ${IMAGE_NAME}:latest
+                        echo "🔍 Checking for image availability..."
+                        # Try to pull from Docker Hub, but use local image if not available
+                        if docker pull ${IMAGE_NAME}:latest 2>/dev/null; then
+                            echo "✅ Using image from Docker Hub"
+                        else
+                            echo "⚠️  Image not found in Docker Hub, using locally built image"
+                            echo "💡 Image will be pushed to Docker Hub after this run for future use"
+                            # Ensure local image is tagged as latest
+                            docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest 2>/dev/null || true
+                        fi
 
-                        echo "🚀 Starting services..."
+                        echo "🚀 Starting services with docker compose..."
                         docker compose up -d
 
                         echo "⏳ Waiting for services to start..."
@@ -710,6 +718,36 @@ except:
         // ====================================
         // PHASE 8: DEPLOYMENT & REPORTING
         // ====================================
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    echo '🚀 Pushing images to Docker Hub...'
+                    withCredentials([usernamePassword(
+                        credentialsId: DOCKER_CREDENTIALS_ID,
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh """
+                            echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+
+                            # Push main application image
+                            echo "📤 Pushing main application image..."
+                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${IMAGE_NAME}:latest
+
+                            # Push AI processor image (for caching in future runs)
+                            echo "📤 Pushing AI processor image for future caching..."
+                            docker push ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
+                            docker push ${AI_PROCESSOR_IMAGE}:latest
+
+                            docker logout
+                            echo "✅ All images pushed to registry"
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Archive Reports') {
             steps {
                 script {
@@ -829,5 +867,4 @@ except:
             }
         }
     }
-    
 }
