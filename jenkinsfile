@@ -244,33 +244,91 @@ pipeline {
                     steps {
                         script {
                             echo '📊 Running SonarQube code quality analysis...'
+
+                            // Check if SonarQube is actually configured and reachable
+                            def sonarConfigured = false
                             try {
                                 withCredentials([string(credentialsId: SONAR_LOGIN_ID, variable: 'SONAR_TOKEN')]) {
-                                    sh '''
-                                        if ! command -v sonar-scanner &> /dev/null; then
-                                            echo "Running SonarScanner via Docker..."
-                                            docker run --rm \\
-                                                -e SONAR_HOST_URL="${SONAR_HOST_URL}" \\
-                                                -e SONAR_TOKEN="${SONAR_TOKEN}" \\
-                                                -v "${PWD}:/usr/src" \\
-                                                sonarsource/sonar-scanner-cli \\
-                                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
-                                                -Dsonar.sources=. \\
-                                                -Dsonar.python.coverage.reportPaths=coverage.xml || echo "SonarQube analysis completed with warnings"
-                                        else
-                                            sonar-scanner \\
-                                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
-                                                -Dsonar.sources=. \\
-                                                -Dsonar.host.url=${SONAR_HOST_URL} \\
-                                                -Dsonar.token=${SONAR_TOKEN} || echo "SonarQube analysis completed"
-                                        fi
-
-                                        echo "✅ SonarQube analysis completed"
-                                    '''
+                                    // Check if token exists and is not empty
+                                    if (env.SONAR_TOKEN && env.SONAR_TOKEN.trim()) {
+                                        sonarConfigured = true
+                                    }
                                 }
                             } catch (Exception e) {
-                                echo "⚠️ SonarQube not configured or unavailable. Skipping..."
-                                echo "To enable: Configure SonarQube server and add token with ID: ${SONAR_LOGIN_ID}"
+                                sonarConfigured = false
+                            }
+
+                            if (!sonarConfigured) {
+                                echo "⚠️ SonarQube not configured - skipping analysis"
+                                echo "💡 To enable SonarQube:"
+                                echo "   1. Install and run SonarQube server"
+                                echo "   2. Add credentials with ID: ${SONAR_LOGIN_ID}"
+                                echo "   3. Update SONAR_HOST_URL in Jenkinsfile"
+                                echo ""
+                                echo "⏩ Continuing pipeline without SonarQube..."
+                            } else {
+                                // SonarQube is configured, check if server is reachable
+                                def serverReachable = sh(
+                                    script: """
+                                        # Try to ping SonarQube server (use host network for Docker)
+                                        # Check if we're using localhost and convert to host.docker.internal for Docker
+                                        SONAR_URL="${SONAR_HOST_URL}"
+                                        if [[ "\${SONAR_URL}" == *"localhost"* ]]; then
+                                            echo "⚠️ SonarQube URL uses 'localhost' - may not be reachable from Docker"
+                                            # Try using host.docker.internal for Docker Desktop
+                                            curl -s -o /dev/null -w "%{http_code}" "http://host.docker.internal:9000/api/system/status" 2>/dev/null | grep -q "200" && echo "reachable" || echo "unreachable"
+                                        else
+                                            # Check if external SonarQube server is reachable
+                                            curl -s -o /dev/null -w "%{http_code}" "\${SONAR_URL}/api/system/status" 2>/dev/null | grep -q "200" && echo "reachable" || echo "unreachable"
+                                        fi
+                                    """,
+                                    returnStdout: true
+                                ).trim()
+
+                                if (serverReachable == "reachable") {
+                                    echo "✅ SonarQube server is reachable, starting scan..."
+                                    withCredentials([string(credentialsId: SONAR_LOGIN_ID, variable: 'SONAR_TOKEN')]) {
+                                        sh '''
+                                            # Adjust SonarQube URL for Docker containers
+                                            SONAR_URL="${SONAR_HOST_URL}"
+                                            if [[ "${SONAR_URL}" == *"localhost"* ]]; then
+                                                SONAR_URL="http://host.docker.internal:9000"
+                                                echo "🔧 Adjusted SonarQube URL for Docker: ${SONAR_URL}"
+                                            fi
+
+                                            if ! command -v sonar-scanner &> /dev/null; then
+                                                echo "Running SonarScanner via Docker with host network..."
+                                                docker run --rm \\
+                                                    --network host \\
+                                                    -e SONAR_HOST_URL="${SONAR_URL}" \\
+                                                    -e SONAR_TOKEN="${SONAR_TOKEN}" \\
+                                                    -v "${PWD}:/usr/src" \\
+                                                    sonarsource/sonar-scanner-cli:latest \\
+                                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
+                                                    -Dsonar.sources=app/ \\
+                                                    -Dsonar.language=python \\
+                                                    -Dsonar.python.coverage.reportPaths=coverage.xml || echo "⚠️ SonarQube scan completed with warnings"
+                                            else
+                                                sonar-scanner \\
+                                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
+                                                    -Dsonar.sources=app/ \\
+                                                    -Dsonar.language=python \\
+                                                    -Dsonar.host.url=${SONAR_URL} \\
+                                                    -Dsonar.token=${SONAR_TOKEN} || echo "⚠️ SonarQube scan completed with warnings"
+                                            fi
+
+                                            echo "✅ SonarQube analysis completed"
+                                        '''
+                                    }
+                                } else {
+                                    echo "⚠️ SonarQube server not reachable at: ${SONAR_HOST_URL}"
+                                    echo "💡 Possible solutions:"
+                                    echo "   1. Start SonarQube server: docker run -d -p 9000:9000 sonarqube:latest"
+                                    echo "   2. Update SONAR_HOST_URL to point to your SonarQube instance"
+                                    echo "   3. Ensure SonarQube is running and accessible from Jenkins"
+                                    echo ""
+                                    echo "⏩ Skipping SonarQube analysis and continuing pipeline..."
+                                }
                             }
                         }
                     }
