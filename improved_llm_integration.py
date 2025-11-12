@@ -24,7 +24,7 @@ class LLMProvider:
 
     def __init__(self, api_token: str):
         self.api_token = api_token
-        self.base_url = "https://api-inference.huggingface.co/models/"
+        self.base_url = "https://router.huggingface.co/hf-inference/models/"
 
     def query(self, model_id: str, payload: Dict[str, Any], max_retries: int = 3) -> Optional[str]:
         """Query the HuggingFace Inference API."""

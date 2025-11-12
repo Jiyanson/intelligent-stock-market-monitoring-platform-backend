@@ -158,7 +158,11 @@ pipeline {
                         script {
                             echo '📦 Running OWASP Dependency-Check (SCA)...'
                             sh '''
-                                # Using Trivy for faster SCA, but comprehensive
+                                # Create reports directory
+                                mkdir -p reports
+
+                                # Using Trivy for comprehensive dependency scanning
+                                echo "🔍 Scanning Python dependencies with Trivy..."
                                 docker run --rm \\
                                     -v ${PWD}:/workspace \\
                                     -v ${PWD}/reports:/reports \\
@@ -166,7 +170,8 @@ pipeline {
                                     fs --format json \\
                                     --output /reports/dependency-check-report.json \\
                                     --scanners vuln \\
-                                    --severity CRITICAL,HIGH,MEDIUM \\
+                                    --severity CRITICAL,HIGH,MEDIUM,LOW \\
+                                    --list-all-pkgs \\
                                     /workspace || echo "Dependency check completed"
 
                                 # Generate HTML report
@@ -178,11 +183,19 @@ pipeline {
                                     --template '@contrib/html.tpl' \\
                                     --output /reports/dependency-check-report.html \\
                                     --scanners vuln \\
+                                    --severity CRITICAL,HIGH,MEDIUM,LOW \\
                                     /workspace || true
 
+                                # Ensure report exists (create empty if scanning failed)
                                 if [ ! -f reports/dependency-check-report.json ]; then
                                     echo '{"Results":[]}' > reports/dependency-check-report.json
+                                    echo "⚠️ No dependency vulnerabilities found or scan failed - created empty report"
+                                else
+                                    # Count vulnerabilities
+                                    VULN_COUNT=$(python3 -c "import json; data=json.load(open('reports/dependency-check-report.json')); print(sum(len(r.get('Vulnerabilities', [])) for r in data.get('Results', [])))" 2>/dev/null || echo "0")
+                                    echo "✅ Dependency scan found ${VULN_COUNT} vulnerabilities"
                                 fi
+
                                 echo "✅ OWASP Dependency-Check completed"
                             '''
                         }
@@ -398,94 +411,53 @@ pipeline {
         stage('AI Security Policy Generation') {
             steps {
                 script {
-                    echo '🤖 Generating AI-powered security policies with DeepSeek R1...'
+                    echo '🤖 Generating AI-powered security policies with DUAL-MODEL COMPARISON...'
+                    echo '   Models: DeepSeek R1 vs LLaMA 3.3 70B'
                     withCredentials([string(credentialsId: HF_TOKEN_CREDENTIALS_ID, variable: 'HF_TOKEN')]) {
                         sh """
-                            # Use AI Processor image for policy generation
+                            # Use AI Processor image for dual-model policy generation
+                            echo "🔬 Running dual-model analysis..."
                             docker run --rm \\
                                 -v \${PWD}/processed:/app/processed \\
                                 -v \${PWD}/ai-policies:/app/ai-policies \\
                                 -v \${PWD}/ai-reports:/app/ai-reports \\
+                                -v \${PWD}/dual_model_policy_generator.py:/app/dual_model_policy_generator.py \\
+                                -v \${PWD}/generate_model_comparison_report.py:/app/generate_model_comparison_report.py \\
                                 -e HF_TOKEN="\${HF_TOKEN}" \\
-                                -e HF_MODEL="${HF_MODEL}" \\
+                                -e BUILD_NUMBER="${BUILD_NUMBER}" \\
                                 ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} \\
-                                python3 -c '
-import os
-import json
-from datetime import datetime
+                                python3 /app/dual_model_policy_generator.py || echo "Dual-model policy generation completed with warnings"
 
-# Load normalized vulnerabilities
-try:
-    with open("/app/processed/normalized_vulnerabilities.json", "r") as f:
-        vuln_data = json.load(f)
-except Exception as e:
-    print(f"⚠️  Could not load vulnerability data: {e}")
-    vuln_data = {"vulnerabilities": [], "risk_metrics": {"total": 0}}
+                            # Generate model comparison HTML report
+                            echo "📊 Generating model comparison report..."
+                            python3 generate_model_comparison_report.py || echo "Comparison report generation completed"
 
-# Generate AI security policies (placeholder for DeepSeek R1 integration)
-policies = {
-    "generated_at": datetime.utcnow().isoformat(),
-    "model": os.getenv("HF_MODEL", "deepseek-ai/DeepSeek-R1"),
-    "total_vulnerabilities": vuln_data.get("risk_metrics", {}).get("total", 0),
-    "policies": [
-        {
-            "id": "POLICY-001",
-            "title": "Critical Vulnerability Remediation",
-            "description": "Address all CRITICAL severity vulnerabilities within 24 hours",
-            "priority": "CRITICAL",
-            "actions": [
-                "Review all CRITICAL findings",
-                "Create remediation tickets",
-                "Deploy patches immediately"
-            ]
-        },
-        {
-            "id": "POLICY-002",
-            "title": "Dependency Update Strategy",
-            "description": "Keep all dependencies up to date with security patches",
-            "priority": "HIGH",
-            "actions": [
-                "Enable automated dependency updates",
-                "Monitor security advisories",
-                "Test updates in staging environment"
-            ]
-        },
-        {
-            "id": "POLICY-003",
-            "title": "Container Hardening",
-            "description": "Implement container security best practices",
-            "priority": "MEDIUM",
-            "actions": [
-                "Use minimal base images",
-                "Run containers as non-root user",
-                "Implement resource limits"
-            ]
-        }
-    ],
-    "recommendations": [
-        "Enable automated security scanning in CI/CD pipeline",
-        "Implement security training for development team",
-        "Establish incident response procedures",
-        "Regular security audit schedule"
-    ]
-}
-
-# Save policies
-os.makedirs("/app/ai-policies", exist_ok=True)
-with open("/app/ai-policies/security-policies.json", "w") as f:
-    json.dump(policies, f, indent=2)
-
-print(f"✅ Generated {len(policies[\"policies\"])} AI security policies")
-print(f"📊 Based on {vuln_data.get(\"risk_metrics\", {}).get(\"total\", 0)} vulnerabilities")
-' || echo "AI policy generation completed with warnings"
-
-                            # Generate AI reports
+                            # Generate standard AI reports
+                            echo "📄 Generating comprehensive AI reports..."
                             python3 generate_ai_reports.py || echo "Report generation completed with warnings"
 
-                            echo "📊 Generated AI artifacts:"
-                            ls -lh ai-policies/*.json ai-reports/*.html 2>/dev/null || echo "No artifacts generated"
+                            # Display results summary
+                            echo ""
+                            echo "======================================================================"
+                            echo "AI-POWERED SECURITY ANALYSIS COMPLETE"
+                            echo "======================================================================"
+                            echo ""
+                            echo "📊 Generated Artifacts:"
+                            ls -lh ai-policies/*.json 2>/dev/null | awk '{print "   • " \$9 " (" \$5 ")"}'
+                            ls -lh ai-reports/*.html 2>/dev/null | awk '{print "   • " \$9 " (" \$5 ")"}'
 
-                            echo "✅ AI security analysis completed"
+                            # Show model comparison results
+                            if [ -f ai-policies/model_comparison_report.json ]; then
+                                echo ""
+                                echo "🏆 Model Comparison Results:"
+                                WINNER=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('model_name', 'N/A'))" 2>/dev/null || echo "N/A")
+                                WINNER_SCORE=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(f\"{data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('quality_score', 0):.1f}\")" 2>/dev/null || echo "0")
+                                echo "   Winner: \${WINNER} (Quality Score: \${WINNER_SCORE}/100)"
+                            fi
+
+                            echo ""
+                            echo "✅ AI security analysis completed successfully"
+                            echo "======================================================================"
                         """
                     }
                 }
@@ -524,35 +496,35 @@ print(f"📊 Based on {vuln_data.get(\"risk_metrics\", {}).get(\"total\", 0)} vu
         // ====================================
         // PHASE 8: DEPLOYMENT & REPORTING
         // ====================================
-        stage('Push to Docker Hub') {
-            steps {
-                script {
-                    echo '🚀 Pushing images to Docker Hub...'
-                    withCredentials([usernamePassword(
-                        credentialsId: DOCKER_CREDENTIALS_ID,
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )]) {
-                        sh """
-                            echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+        // stage('Push to Docker Hub') {
+        //     steps {
+        //         script {
+        //             echo '🚀 Pushing images to Docker Hub...'
+        //             withCredentials([usernamePassword(
+        //                 credentialsId: DOCKER_CREDENTIALS_ID,
+        //                 usernameVariable: 'DOCKER_USER',
+        //                 passwordVariable: 'DOCKER_PASS'
+        //             )]) {
+        //                 sh """
+        //                     echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
 
-                            # Push main application image
-                            echo "📤 Pushing main application image..."
-                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
-                            docker push ${IMAGE_NAME}:latest
+        //                     # Push main application image
+        //                     echo "📤 Pushing main application image..."
+        //                     docker push ${IMAGE_NAME}:${IMAGE_TAG}
+        //                     docker push ${IMAGE_NAME}:latest
 
-                            # Push AI processor image (for caching in future runs)
-                            echo "📤 Pushing AI processor image for future caching..."
-                            docker push ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
-                            docker push ${AI_PROCESSOR_IMAGE}:latest
+        //                     # Push AI processor image (for caching in future runs)
+        //                     echo "📤 Pushing AI processor image for future caching..."
+        //                     docker push ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
+        //                     docker push ${AI_PROCESSOR_IMAGE}:latest
 
-                            docker logout
-                            echo "✅ All images pushed to registry"
-                        """
-                    }
-                }
-            }
-        }
+        //                     docker logout
+        //                     echo "✅ All images pushed to registry"
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Archive Reports') {
             steps {
