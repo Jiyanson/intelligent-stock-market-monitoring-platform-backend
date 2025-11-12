@@ -151,6 +151,34 @@ pipeline {
         // ====================================
         // PHASE 4: SECURITY SCANNING (PARALLEL)
         // ====================================
+        stage('Initialize Trivy Database') {
+            steps {
+                script {
+                    echo '📥 Downloading Trivy vulnerability database (one-time setup)...'
+                    sh '''
+                        # Create Trivy cache directory
+                        mkdir -p ${HOME}/.cache/trivy
+
+                        # Download/update Trivy DB with extended timeout
+                        echo "⏳ Downloading vulnerability database (this may take a few minutes on first run)..."
+                        docker run --rm \\
+                            -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
+                            aquasec/trivy:latest \\
+                            image --download-db-only --timeout 15m || {
+                                echo "⚠️  DB download timeout - will use offline mode for scans"
+                                touch ${HOME}/.cache/trivy/db-failed
+                            }
+
+                        if [ -f ${HOME}/.cache/trivy/db-failed ]; then
+                            echo "⚠️  Trivy DB download failed - scans will run in offline mode with cached data"
+                        else
+                            echo "✅ Trivy vulnerability database ready"
+                        fi
+                    '''
+                }
+            }
+        }
+
         stage('Security Scanning') {
             parallel {
                 stage('SCA - OWASP Dependency Check') {
@@ -161,29 +189,44 @@ pipeline {
                                 # Create reports directory
                                 mkdir -p reports
 
+                                # Check if Trivy DB is available
+                                if [ -f ${HOME}/.cache/trivy/db-failed ]; then
+                                    DB_UPDATE_FLAG="--skip-db-update"
+                                    echo "⚠️  Using offline mode (DB unavailable)"
+                                else
+                                    DB_UPDATE_FLAG="--skip-db-update"
+                                    echo "✅ Using cached vulnerability database"
+                                fi
+
                                 # Using Trivy for comprehensive dependency scanning
                                 echo "🔍 Scanning Python dependencies with Trivy..."
                                 docker run --rm \\
+                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
                                     -v ${PWD}:/workspace \\
                                     -v ${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
-                                    fs --format json \\
+                                    fs ${DB_UPDATE_FLAG} \\
+                                    --format json \\
                                     --output /reports/dependency-check-report.json \\
                                     --scanners vuln \\
                                     --severity CRITICAL,HIGH,MEDIUM,LOW \\
                                     --list-all-pkgs \\
+                                    --timeout 10m \\
                                     /workspace || echo "Dependency check completed"
 
                                 # Generate HTML report
                                 docker run --rm \\
+                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
                                     -v ${PWD}:/workspace \\
                                     -v ${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
-                                    fs --format template \\
+                                    fs ${DB_UPDATE_FLAG} \\
+                                    --format template \\
                                     --template '@contrib/html.tpl' \\
                                     --output /reports/dependency-check-report.html \\
                                     --scanners vuln \\
                                     --severity CRITICAL,HIGH,MEDIUM,LOW \\
+                                    --timeout 10m \\
                                     /workspace || true
 
                                 # Ensure report exists (create empty if scanning failed)
@@ -207,22 +250,29 @@ pipeline {
                         script {
                             echo '🔒 Running Trivy container image scan...'
                             sh """
+                                # Use cached DB
                                 docker run --rm \\
+                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
                                     -v \${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
-                                    image --format json \\
+                                    image --skip-db-update \\
+                                    --format json \\
                                     --output /reports/trivy-image-scan.json \\
+                                    --timeout 10m \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy scan completed"
 
                                 # Generate HTML report
                                 docker run --rm \\
+                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
                                     -v \${PWD}/reports:/reports \\
                                     aquasec/trivy:latest \\
-                                    image --format template \\
+                                    image --skip-db-update \\
+                                    --format template \\
                                     --template '@contrib/html.tpl' \\
                                     --output /reports/trivy-report.html \\
+                                    --timeout 10m \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || true
 
                                 # Fix permissions on report files
@@ -404,12 +454,18 @@ pipeline {
                     sh '''
                         TARGET_URL="http://localhost:8000"
 
+                        # Ensure reports directory exists with proper permissions
+                        mkdir -p reports
+                        chmod 777 reports  # Allow ZAP container to write
+
                         # Test if app is reachable
                         if curl -f -s ${TARGET_URL}/docs >/dev/null 2>&1 || curl -f -s ${TARGET_URL}/health >/dev/null 2>&1; then
                             echo "✅ Application is reachable, starting ZAP scan..."
 
+                            # Run ZAP with user ID mapping to avoid permission issues
                             docker run --rm \\
                                 --network="host" \\
+                                --user $(id -u):$(id -g) \\
                                 -v ${PWD}/reports:/zap/wrk:rw \\
                                 ghcr.io/zaproxy/zaproxy:stable \\
                                 zap-baseline.py \\
@@ -418,11 +474,14 @@ pipeline {
                                 -r zap-report.html \\
                                 -I || echo "ZAP scan completed with warnings"
 
-                            # Fix permissions on ZAP reports
+                            # Fix permissions on ZAP reports (in case still needed)
                             chmod 666 reports/zap-report.* 2>/dev/null || true
 
                             if [ -f reports/zap-report.json ]; then
                                 echo "✅ DAST scan completed - report saved"
+                                # Count alerts
+                                ALERT_COUNT=$(python3 -c "import json; data=json.load(open('reports/zap-report.json', 'r')); print(len(data.get('site', [{}])[0].get('alerts', [])))" 2>/dev/null || echo "0")
+                                echo "   Found ${ALERT_COUNT} security alerts"
                             else
                                 echo "⚠️  ZAP scan completed but no report generated"
                                 echo '{"alerts":[]}' > reports/zap-report.json
@@ -473,18 +532,14 @@ pipeline {
                     echo '   Models: DeepSeek R1 vs LLaMA 3.3 70B'
                     withCredentials([string(credentialsId: HF_TOKEN_CREDENTIALS_ID, variable: 'HF_TOKEN')]) {
                         sh """
-                            # Use AI Processor image for dual-model policy generation
-                            echo "🔬 Running dual-model analysis..."
-                            docker run --rm \\
-                                -v \${PWD}/processed:/app/processed \\
-                                -v \${PWD}/ai-policies:/app/ai-policies \\
-                                -v \${PWD}/ai-reports:/app/ai-reports \\
-                                -v \${PWD}/dual_model_policy_generator.py:/app/dual_model_policy_generator.py \\
-                                -v \${PWD}/generate_model_comparison_report.py:/app/generate_model_comparison_report.py \\
-                                -e HF_TOKEN="\${HF_TOKEN}" \\
-                                -e BUILD_NUMBER="${BUILD_NUMBER}" \\
-                                ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG} \\
-                                python3 /app/dual_model_policy_generator.py || echo "Dual-model policy generation completed with warnings"
+                            # Use Python 3 directly with mounted scripts (avoids stale Docker image)
+                            echo "🔬 Running dual-model analysis with latest code..."
+
+                            # Install required Python packages if needed
+                            pip3 install --quiet requests 2>/dev/null || true
+
+                            # Run dual-model generator directly
+                            python3 dual_model_policy_generator.py || echo "Dual-model policy generation completed with warnings"
 
                             # Generate model comparison HTML report
                             echo "📊 Generating model comparison report..."
