@@ -3,14 +3,38 @@ FROM python:3.11-slim
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install AI/ML packages
+# Configure pip for better timeout handling
+RUN pip config set global.timeout 600 && \
+    pip config set global.retries 5 && \
+    pip install --upgrade pip setuptools wheel
+
+# Install PyTorch FIRST (largest package, ~800MB) with extended timeouts
+# Using CPU-only version to reduce size from 800MB to ~200MB
 RUN pip install --no-cache-dir \
+    --timeout=1000 \
+    --default-timeout=1000 \
+    --retries=5 \
+    torch>=2.1.0 --index-url https://download.pytorch.org/whl/cpu || \
+    # Fallback to standard PyPI if PyTorch repo fails
+    pip install --no-cache-dir --timeout=1000 torch>=2.1.0
+
+# Install transformers and core dependencies (second batch, ~200MB)
+RUN pip install --no-cache-dir \
+    --timeout=600 \
+    --default-timeout=600 \
+    --retries=5 \
     transformers>=4.35.0 \
-    torch>=2.1.0 \
     accelerate>=0.25.0 \
-    huggingface-hub>=0.19.0 \
+    huggingface-hub>=0.19.0
+
+# Install remaining smaller packages (third batch, ~30MB)
+RUN pip install --no-cache-dir \
+    --timeout=300 \
+    --default-timeout=300 \
+    --retries=3 \
     sentencepiece>=0.1.99 \
     protobuf>=4.25.0 \
     jinja2>=3.1.2 \
