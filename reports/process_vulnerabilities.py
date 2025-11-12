@@ -21,7 +21,7 @@ from pathlib import Path
 class VulnerabilityNormalizer:
     """Normalizes vulnerability reports from multiple security tools."""
 
-    def __init__(self, reports_dir: str = "/reports", output_dir: str = "/processed"):
+    def __init__(self, reports_dir: str = ".", output_dir: str = "../processed"):
         self.reports_dir = Path(reports_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
