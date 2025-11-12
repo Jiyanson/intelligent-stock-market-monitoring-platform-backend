@@ -296,6 +296,7 @@ class VulnerabilityNormalizer:
         reports = {
             'gitleaks-report.json': self.normalize_gitleaks,
             'semgrep-report.json': self.normalize_semgrep,
+            'dependency-check-report.json': self.normalize_trivy,  # Trivy SCA scan (named as dependency-check for compatibility)
             'trivy-dependencies.json': self.normalize_trivy,  # Fast Trivy SCA scan
             'trivy-image-scan.json': self.normalize_trivy,    # Container image scan
             'trivy-report.json': self.normalize_trivy,         # Legacy/fallback
