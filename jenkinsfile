@@ -635,7 +635,7 @@ except:
                             echo "✅ Normalized $VULN_COUNT vulnerabilities (Critical: $CRITICAL, High: $HIGH)"
                         else
                             echo "Creating placeholder normalized data..."
-                            echo '{"vulnerabilities":[],"risk_metrics":{"total":0}}' > processed/normalized_vulnerabilities.json
+                            echo '{"vulnerabilities":[],"risk_metrics":{"total":0,"critical":0,"high":0,"medium":0,"low":0,"risk_score":0,"risk_level":"LOW"}}' > processed/normalized_vulnerabilities.json
                         fi
                     '''
                 }
@@ -667,8 +667,8 @@ except:
                             echo "======================================================================"
                             echo ""
                             echo "📊 Generated Artifacts:"
-                            ls -lh ai-policies/*.json 2>/dev/null | awk '{print "   • " \$9 " (" \$5 ")"}'
-                            ls -lh ai-reports/*.html 2>/dev/null | awk '{print "   • " \$9 " (" \$5 ")"}'
+                            ls -lh ai-policies/*.json 2>/dev/null | awk '{print "   • " \$9 " - " \$5}' || echo "   No policy files found"
+                            ls -lh ai-reports/*.html 2>/dev/null | awk '{print "   • " \$9 " - " \$5}' || echo "   No report files found"
 
                             if [ -f ai-policies/model_comparison_report.json ]; then
                                 echo ""
