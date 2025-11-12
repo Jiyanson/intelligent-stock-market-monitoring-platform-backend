@@ -186,61 +186,124 @@ pipeline {
                         script {
                             echo '📦 Running OWASP Dependency-Check (SCA)...'
                             sh '''
-                                # Create reports directory
+                                # Create reports directory with proper permissions
                                 mkdir -p reports
+                                chmod 755 reports
 
-                                # Check if Trivy DB is available
-                                if [ -f ${HOME}/.cache/trivy/db-failed ]; then
-                                    DB_UPDATE_FLAG="--skip-db-update"
-                                    echo "⚠️  Using offline mode (DB unavailable)"
+                                echo "🔍 Starting OWASP Dependency-Check for Python dependencies..."
+
+                                # Check if Python dependency files exist
+                                if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] || [ -f "Pipfile" ] || [ -f "setup.py" ]; then
+                                    echo "✅ Found Python dependency files"
+
+                                    # List found files
+                                    echo "📄 Dependency files detected:"
+                                    ls -lh requirements*.txt pyproject.toml Pipfile setup.py 2>/dev/null || true
+
+                                    # Run OWASP Dependency-Check with proper configuration
+                                    echo "🔍 Running OWASP Dependency-Check analysis..."
+                                    docker run --rm \\
+                                        -u $(id -u):$(id -g) \\
+                                        -v $(pwd):/src:ro \\
+                                        -v $(pwd)/reports:/src/reports:rw \\
+                                        -v dependency-check-cache:/usr/share/dependency-check/data \\
+                                        --name dependency-check-$(date +%s) \\
+                                        owasp/dependency-check:latest \\
+                                        --scan /src \\
+                                        --format JSON \\
+                                        --format HTML \\
+                                        --out /src/reports \\
+                                        --project "Stock Market Platform" \\
+                                        --enableExperimental \\
+                                        --disableNodeJS \\
+                                        --disableRubygems \\
+                                        --disableAssembly \\
+                                        --log /src/reports/dependency-check.log \\
+                                        --suppression /src/.dependency-check-suppressions.xml || {
+                                            echo "⚠️  Dependency-Check completed with warnings"
+                                            echo "Check reports/dependency-check.log for details"
+                                        }
+
+                                    # Check if reports were generated
+                                    if [ -f reports/dependency-check-report.json ]; then
+                                        echo "✅ OWASP Dependency-Check JSON report generated"
+
+                                        # Count vulnerabilities
+                                        VULN_COUNT=$(python3 -c "
+import json
+import sys
+try:
+    with open('reports/dependency-check-report.json', 'r') as f:
+        data = json.load(f)
+    deps = data.get('dependencies', [])
+    total = sum(len(d.get('vulnerabilities', [])) for d in deps)
+    print(total)
+except Exception as e:
+    print('0')
+" 2>/dev/null || echo "0")
+
+                                        echo "📊 Found ${VULN_COUNT} vulnerabilities in dependencies"
+
+                                        # Extract severity counts
+                                        python3 -c "
+import json
+try:
+    with open('reports/dependency-check-report.json', 'r') as f:
+        data = json.load(f)
+
+    severities = {'CRITICAL': 0, 'HIGH': 0, 'MEDIUM': 0, 'LOW': 0}
+
+    for dep in data.get('dependencies', []):
+        for vuln in dep.get('vulnerabilities', []):
+            severity = vuln.get('severity', 'UNKNOWN').upper()
+            if severity in severities:
+                severities[severity] += 1
+
+    print('  🔴 Critical:', severities['CRITICAL'])
+    print('  🟠 High:', severities['HIGH'])
+    print('  🟡 Medium:', severities['MEDIUM'])
+    print('  🟢 Low:', severities['LOW'])
+except Exception as e:
+    print('  ⚠️ Could not parse severity details')
+" || true
+
+                                    else
+                                        echo "⚠️ JSON report not generated, creating empty report"
+                                        echo '{"dependencies":[]}' > reports/dependency-check-report.json
+                                    fi
+
+                                    if [ -f reports/dependency-check-report.html ]; then
+                                        echo "✅ OWASP Dependency-Check HTML report generated"
+                                    else
+                                        echo "⚠️ HTML report not generated"
+                                    fi
+
+                                    # Fix permissions on generated reports
+                                    chmod 644 reports/dependency-check-report.* 2>/dev/null || true
+
                                 else
-                                    DB_UPDATE_FLAG="--skip-db-update"
-                                    echo "✅ Using cached vulnerability database"
-                                fi
-
-                                # Using Trivy for comprehensive dependency scanning
-                                echo "🔍 Scanning Python dependencies with Trivy..."
-                                docker run --rm \\
-                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
-                                    -v ${PWD}:/workspace \\
-                                    -v ${PWD}/reports:/reports \\
-                                    aquasec/trivy:latest \\
-                                    fs ${DB_UPDATE_FLAG} \\
-                                    --format json \\
-                                    --output /reports/dependency-check-report.json \\
-                                    --scanners vuln \\
-                                    --severity CRITICAL,HIGH,MEDIUM,LOW \\
-                                    --list-all-pkgs \\
-                                    --timeout 10m \\
-                                    /workspace || echo "Dependency check completed"
-
-                                # Generate HTML report
-                                docker run --rm \\
-                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
-                                    -v ${PWD}:/workspace \\
-                                    -v ${PWD}/reports:/reports \\
-                                    aquasec/trivy:latest \\
-                                    fs ${DB_UPDATE_FLAG} \\
-                                    --format template \\
-                                    --template '@contrib/html.tpl' \\
-                                    --output /reports/dependency-check-report.html \\
-                                    --scanners vuln \\
-                                    --severity CRITICAL,HIGH,MEDIUM,LOW \\
-                                    --timeout 10m \\
-                                    /workspace || true
-
-                                # Ensure report exists (create empty if scanning failed)
-                                if [ ! -f reports/dependency-check-report.json ]; then
-                                    echo '{"Results":[]}' > reports/dependency-check-report.json
-                                    echo "⚠️ No dependency vulnerabilities found or scan failed - created empty report"
-                                else
-                                    # Count vulnerabilities
-                                    VULN_COUNT=$(python3 -c "import json; data=json.load(open('reports/dependency-check-report.json')); print(sum(len(r.get('Vulnerabilities', [])) for r in data.get('Results', [])))" 2>/dev/null || echo "0")
-                                    echo "✅ Dependency scan found ${VULN_COUNT} vulnerabilities"
+                                    echo "⚠️  No Python dependency files found"
+                                    echo "Creating placeholder report..."
+                                    echo '{"dependencies":[]}' > reports/dependency-check-report.json
                                 fi
 
                                 echo "✅ OWASP Dependency-Check completed"
                             '''
+                        }
+                    }
+
+                    post {
+                        always {
+                            script {
+                                // Archive the log file if it exists
+                                sh 'ls -lh reports/dependency-check* 2>/dev/null || true'
+                            }
+                        }
+                        success {
+                            echo "✅ Dependency check completed successfully"
+                        }
+                        failure {
+                            echo "❌ Dependency check failed"
                         }
                     }
                 }
@@ -297,11 +360,13 @@ pipeline {
 
                             // Check if SonarQube is actually configured and reachable
                             def sonarConfigured = false
+                            def sonarToken = ""
+
                             try {
                                 withCredentials([string(credentialsId: SONAR_LOGIN_ID, variable: 'SONAR_TOKEN')]) {
-                                    // Check if token exists and is not empty
                                     if (env.SONAR_TOKEN && env.SONAR_TOKEN.trim()) {
                                         sonarConfigured = true
+                                        sonarToken = env.SONAR_TOKEN
                                     }
                                 }
                             } catch (Exception e) {
@@ -317,69 +382,85 @@ pipeline {
                                 echo ""
                                 echo "⏩ Continuing pipeline without SonarQube..."
                             } else {
-                                // SonarQube is configured, check if server is reachable
-                                def serverReachable = sh(
-                                    script: """
-                                        # Try to ping SonarQube server (use host network for Docker)
-                                        # Check if we're using localhost and convert to host.docker.internal for Docker
-                                        SONAR_URL="${SONAR_HOST_URL}"
-                                        if [[ "\${SONAR_URL}" == *"localhost"* ]]; then
-                                            echo "⚠️ SonarQube URL uses 'localhost' - may not be reachable from Docker"
-                                            # Try using host.docker.internal for Docker Desktop
-                                            curl -s -o /dev/null -w "%{http_code}" "http://host.docker.internal:9000/api/system/status" 2>/dev/null | grep -q "200" && echo "reachable" || echo "unreachable"
-                                        else
-                                            # Check if external SonarQube server is reachable
-                                            curl -s -o /dev/null -w "%{http_code}" "\${SONAR_URL}/api/system/status" 2>/dev/null | grep -q "200" && echo "reachable" || echo "unreachable"
-                                        fi
-                                    """,
-                                    returnStdout: true
-                                ).trim()
+                                // Simple and reliable server reachability check
+                                def serverReachable = false
+                                try {
+                                    // Test server connectivity directly from Jenkins node
+                                    def response = sh(
+                                        script: """
+                                            curl -s -o /dev/null -w "%{http_code}" "${SONAR_HOST_URL}/api/system/status" || echo "000"
+                                        """,
+                                        returnStdout: true
+                                    ).trim()
 
-                                if (serverReachable == "reachable") {
+                                    serverReachable = (response == "200")
+                                } catch (Exception e) {
+                                    serverReachable = false
+                                }
+
+                                if (serverReachable) {
                                     echo "✅ SonarQube server is reachable, starting scan..."
+
                                     withCredentials([string(credentialsId: SONAR_LOGIN_ID, variable: 'SONAR_TOKEN')]) {
-                                        sh '''
-                                            # Adjust SonarQube URL for Docker containers
-                                            SONAR_URL="${SONAR_HOST_URL}"
-                                            if [[ "${SONAR_URL}" == *"localhost"* ]]; then
-                                                SONAR_URL="http://host.docker.internal:9000"
-                                                echo "🔧 Adjusted SonarQube URL for Docker: ${SONAR_URL}"
-                                            fi
+                                        sh """
+                                            # Use Docker with host network for local SonarQube
+                                            echo "🔧 Starting SonarQube scan with Docker..."
 
-                                            if ! command -v sonar-scanner &> /dev/null; then
-                                                echo "Running SonarScanner via Docker with host network..."
-                                                docker run --rm \\
-                                                    --network host \\
-                                                    -e SONAR_HOST_URL="${SONAR_URL}" \\
-                                                    -e SONAR_TOKEN="${SONAR_TOKEN}" \\
-                                                    -v "${PWD}:/usr/src" \\
-                                                    sonarsource/sonar-scanner-cli:latest \\
-                                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
-                                                    -Dsonar.sources=app/ \\
-                                                    -Dsonar.language=python \\
-                                                    -Dsonar.python.coverage.reportPaths=coverage.xml || echo "⚠️ SonarQube scan completed with warnings"
-                                            else
-                                                sonar-scanner \\
-                                                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
-                                                    -Dsonar.sources=app/ \\
-                                                    -Dsonar.language=python \\
-                                                    -Dsonar.host.url=${SONAR_URL} \\
-                                                    -Dsonar.token=${SONAR_TOKEN} || echo "⚠️ SonarQube scan completed with warnings"
-                                            fi
+                                            docker run --rm \\
+                                                --network=host \\
+                                                -e SONAR_HOST_URL="${SONAR_HOST_URL}" \\
+                                                -e SONAR_TOKEN="\${SONAR_TOKEN}" \\
+                                                -v "\${PWD}:/usr/src" \\
+                                                sonarsource/sonar-scanner-cli:latest \\
+                                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \\
+                                                -Dsonar.sources=app/ \\
+                                                -Dsonar.language=python \\
+                                                -Dsonar.scm.disabled=true \\
+                                                -Dsonar.sourceEncoding=UTF-8 \\
+                                                -Dsonar.projectVersion=1.0.0
 
-                                            echo "✅ SonarQube analysis completed"
-                                        '''
+                                            echo "✅ SonarQube analysis completed successfully"
+                                        """
                                     }
                                 } else {
-                                    echo "⚠️ SonarQube server not reachable at: ${SONAR_HOST_URL}"
-                                    echo "💡 Possible solutions:"
-                                    echo "   1. Start SonarQube server: docker run -d -p 9000:9000 sonarqube:latest"
-                                    echo "   2. Update SONAR_HOST_URL to point to your SonarQube instance"
-                                    echo "   3. Ensure SonarQube is running and accessible from Jenkins"
+                                    echo "❌ SonarQube server not reachable at: ${SONAR_HOST_URL}"
+                                    echo "🔧 Debug information:"
+                                    echo "   - Testing connectivity from Jenkins node..."
+
+                                    // Debug commands to help troubleshoot
+                                    sh """
+                                        echo "=== Network Debug Information ==="
+                                        echo "Ping localhost: ping -c 2 localhost"
+                                        ping -c 2 localhost || echo "Ping failed"
+                                        echo ""
+                                        echo "Netstat check: netstat -tulpn | grep 9000 || echo 'Port 9000 not found'"
+                                        netstat -tulpn | grep 9000 || echo "Port 9000 not listening"
+                                        echo ""
+                                        echo "Docker network check: docker network ls"
+                                        docker network ls
+                                        echo "=== End Debug ==="
+                                    """
+
+                                    echo "💡 Solutions for local SonarQube:"
+                                    echo "   1. Ensure SonarQube is running: docker ps | grep sonar"
+                                    echo "   2. Use --network=host in Docker commands"
+                                    echo "   3. For Jenkins in Docker, use host networking"
                                     echo ""
                                     echo "⏩ Skipping SonarQube analysis and continuing pipeline..."
                                 }
                             }
+                        }
+                    }
+
+                    post {
+                        success {
+                            echo "✅ SonarQube stage completed successfully"
+                        }
+                        failure {
+                            echo "❌ SonarQube stage failed"
+                        }
+                        unstable {
+                            echo "⚠️ SonarQube stage completed with warnings"
                         }
                     }
                 }
