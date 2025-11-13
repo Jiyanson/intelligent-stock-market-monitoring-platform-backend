@@ -1,0 +1,492 @@
+{
+  "metadata": {
+    "generated_at": "2025-11-13T02:40:21.277716",
+    "build_number": "49",
+    "total_vulnerabilities": 1471
+  },
+  "analysis": {
+    "total": 1471,
+    "by_severity": {
+      "CRITICAL": 6,
+      "HIGH": 120,
+      "MEDIUM": 442,
+      "LOW": 850,
+      "INFO": 0
+    },
+    "by_tool": {
+      "Gitleaks": 6,
+      "Trivy": 1465
+    },
+    "by_category": {
+      "Secrets": 6,
+      "Container Security": 1465
+    },
+    "top_critical": [
+      {
+        "id": "GITLEAKS-",
+        "title": "Secret detected: generic-api-key",
+        "severity": "CRITICAL",
+        "tool": "Gitleaks",
+        "package": "/workspace/reports/trivy-image-scan.json",
+        "description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations."
+      },
+      {
+        "id": "GITLEAKS-",
+        "title": "Secret detected: generic-api-key",
+        "severity": "CRITICAL",
+        "tool": "Gitleaks",
+        "package": "/workspace/reports/trivy-image-scan.json",
+        "description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations."
+      },
+      {
+        "id": "GITLEAKS-",
+        "title": "Secret detected: generic-api-key",
+        "severity": "CRITICAL",
+        "tool": "Gitleaks",
+        "package": "/workspace/reports/trivy-report.json",
+        "description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations."
+      },
+      {
+        "id": "GITLEAKS-",
+        "title": "Secret detected: generic-api-key",
+        "severity": "CRITICAL",
+        "tool": "Gitleaks",
+        "package": "/workspace/reports/trivy-report.json",
+        "description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations."
+      },
+      {
+        "id": "GITLEAKS-",
+        "title": "Secret detected: generic-api-key",
+        "severity": "CRITICAL",
+        "tool": "Gitleaks",
+        "package": "/workspace/reports/trivy-image-report.json",
+        "description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations."
+      },
+      {
+        "id": "GITLEAKS-",
+        "title": "Secret detected: generic-api-key",
+        "severity": "CRITICAL",
+        "tool": "Gitleaks",
+        "package": "/workspace/reports/trivy-image-report.json",
+        "description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations."
+      },
+      {
+        "id": "CVE-2025-62727",
+        "title": "CVE-2025-62727 in starlette",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "starlette",
+        "description": "Starlette is a lightweight ASGI framework/toolkit. Starting in version 0.39.0 and prior to version 0.49.1 , an unauthenticated attacker can send a crafted HTTP Range header that triggers quadratic-tim"
+      },
+      {
+        "id": "CVE-2025-62727",
+        "title": "CVE-2025-62727 in starlette",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "starlette",
+        "description": "Starlette is a lightweight ASGI framework/toolkit. Starting in version 0.39.0 and prior to version 0.49.1 , an unauthenticated attacker can send a crafted HTTP Range header that triggers quadratic-tim"
+      },
+      {
+        "id": "CVE-2013-7445",
+        "title": "CVE-2013-7445 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "The Direct Rendering Manager (DRM) subsystem in the Linux kernel through 4.x mishandles requests for Graphics Execution Manager (GEM) objects, which allows context-dependent attackers to cause a denia"
+      },
+      {
+        "id": "CVE-2019-19449",
+        "title": "CVE-2019-19449 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel 5.0.21, mounting a crafted f2fs filesystem image can lead to slab-out-of-bounds read access in f2fs_build_segment_manager in fs/f2fs/segment.c, related to init_min_max_mtime in fs/"
+      },
+      {
+        "id": "CVE-2019-19814",
+        "title": "CVE-2019-19814 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel 5.0.21, mounting a crafted f2fs filesystem image can cause __remove_dirty_segment slab-out-of-bounds write access because an array is bounded by the number of dirty types (8) but t"
+      },
+      {
+        "id": "CVE-2021-3847",
+        "title": "CVE-2021-3847 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "An unauthorized access to the execution of the setuid file with capabilities flaw in the Linux kernel OverlayFS subsystem was found in the way user copying a capable file from a nosuid mount into anot"
+      },
+      {
+        "id": "CVE-2021-3864",
+        "title": "CVE-2021-3864 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "A flaw was found in the way the dumpable flag setting was handled when certain SUID binaries executed its descendants. The prerequisite is a SUID binary that sets real UID equal to effective UID, and "
+      },
+      {
+        "id": "CVE-2024-21803",
+        "title": "CVE-2024-21803 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "Use After Free vulnerability in Linux Linux kernel kernel on Linux, x86, ARM (bluetooth modules) allows Local Execution of Code. This vulnerability is associated with program files https://gitee.Com/a"
+      },
+      {
+        "id": "CVE-2024-57995",
+        "title": "CVE-2024-57995 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nwifi: ath12k: fix read pointer after free in ath12k_mac_assign_vif_to_vdev()\n\nIn ath12k_mac_assign_vif_to_vdev(), if arvif is creat"
+      },
+      {
+        "id": "CVE-2024-58015",
+        "title": "CVE-2024-58015 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nwifi: ath12k: Fix for out-of bound access error\n\nSelfgen stats are placed in a buffer using print_array_to_buf_index() function.\nAr"
+      },
+      {
+        "id": "CVE-2024-58093",
+        "title": "CVE-2024-58093 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nPCI/ASPM: Fix link state exit during switch upstream function removal\n\nBefore 456d8aa37d0f (\"PCI/ASPM: Disable ASPM on MFD function"
+      },
+      {
+        "id": "CVE-2025-22104",
+        "title": "CVE-2025-22104 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nibmvnic: Use kernel helpers for hex dumps\n\nPreviously, when the driver was printing hex dumps, the buffer was cast\nto an 8 byte lon"
+      },
+      {
+        "id": "CVE-2025-22107",
+        "title": "CVE-2025-22107 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nnet: dsa: sja1105: fix kasan out-of-bounds warning in sja1105_table_delete_entry()\n\nThere are actually 2 problems:\n- deleting the l"
+      },
+      {
+        "id": "CVE-2025-22118",
+        "title": "CVE-2025-22118 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nice: validate queue quanta parameters to prevent OOB access\n\nAdd queue wraparound prevention in quanta configuration.\nEnsure end_qi"
+      },
+      {
+        "id": "CVE-2025-22121",
+        "title": "CVE-2025-22121 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\next4: fix out-of-bound read in ext4_xattr_inode_dec_ref_all()\n\nThere's issue as follows:\nBUG: KASAN: use-after-free in ext4_xattr_i"
+      },
+      {
+        "id": "CVE-2025-37803",
+        "title": "CVE-2025-37803 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nudmabuf: fix a buf size overflow issue during udmabuf creation\n\nby casting size_limit_mb to u64  when calculate pglimit."
+      },
+      {
+        "id": "CVE-2025-37825",
+        "title": "CVE-2025-37825 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nnvmet: fix out-of-bounds access in nvmet_enable_port\n\nWhen trying to enable a port that has no transport configured yet,\nnvmet_enab"
+      },
+      {
+        "id": "CVE-2025-37906",
+        "title": "CVE-2025-37906 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nublk: fix race between io_uring_cmd_complete_in_task and ublk_cancel_cmd\n\nublk_cancel_cmd() calls io_uring_cmd_done() to complete u"
+      },
+      {
+        "id": "CVE-2025-38029",
+        "title": "CVE-2025-38029 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nkasan: avoid sleepable page allocation from atomic context\n\napply_to_pte_range() enters the lazy MMU mode and then invokes\nkasan_po"
+      },
+      {
+        "id": "CVE-2025-38036",
+        "title": "CVE-2025-38036 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ndrm/xe/vf: Perform early GT MMIO initialization to read GMDID\n\nVFs need to communicate with the GuC to obtain the GMDID value\nand e"
+      },
+      {
+        "id": "CVE-2025-38041",
+        "title": "CVE-2025-38041 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nclk: sunxi-ng: h616: Reparent GPU clock during frequency changes\n\nThe H616 manual does not state that the GPU PLL supports\ndynamic "
+      },
+      {
+        "id": "CVE-2025-38042",
+        "title": "CVE-2025-38042 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ndmaengine: ti: k3-udma-glue: Drop skip_fdq argument from k3_udma_glue_reset_rx_chn\n\nThe user of k3_udma_glue_reset_rx_chn() e.g. ti"
+      },
+      {
+        "id": "CVE-2025-38064",
+        "title": "CVE-2025-38064 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nvirtio: break and reset virtio devices on device_shutdown()\n\nHongyu reported a hang on kexec in a VM. QEMU reported invalid memory\n"
+      },
+      {
+        "id": "CVE-2025-38105",
+        "title": "CVE-2025-38105 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nALSA: usb-audio: Kill timer properly at removal\n\nThe USB-audio MIDI code initializes the timer, but in a rare case, the\ndriver migh"
+      },
+      {
+        "id": "CVE-2025-38137",
+        "title": "CVE-2025-38137 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nPCI/pwrctrl: Cancel outstanding rescan work when unregistering\n\nIt's possible to trigger use-after-free here by:\n\n  (a) forcing res"
+      },
+      {
+        "id": "CVE-2025-38140",
+        "title": "CVE-2025-38140 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ndm: limit swapping tables for devices with zone write plugs\n\ndm_revalidate_zones() only allowed new or previously unzoned devices t"
+      },
+      {
+        "id": "CVE-2025-38248",
+        "title": "CVE-2025-38248 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nbridge: mcast: Fix use-after-free during router port configuration\n\nThe bridge maintains a global list of ports behind which a mult"
+      },
+      {
+        "id": "CVE-2025-38311",
+        "title": "CVE-2025-38311 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\niavf: get rid of the crit lock\n\nGet rid of the crit lock.\nThat frees us from the error prone logic of try_locks.\n\nThanks to netdev_"
+      },
+      {
+        "id": "CVE-2025-38322",
+        "title": "CVE-2025-38322 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nperf/x86/intel: Fix crash in icl_update_topdown_event()\n\nThe perf_fuzzer found a hard-lockup crash on a RaptorLake machine:\n\n  Oops"
+      },
+      {
+        "id": "CVE-2025-39677",
+        "title": "CVE-2025-39677 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nnet/sched: Fix backlog accounting in qdisc_dequeue_internal\n\nThis issue applies for the following qdiscs: hhf, fq, fq_codel, and\nfq"
+      },
+      {
+        "id": "CVE-2025-39775",
+        "title": "CVE-2025-39775 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nmm/mremap: fix WARN with uffd that has remap events disabled\n\nRegistering userfaultd on a VMA that spans at least one PMD and then\n"
+      },
+      {
+        "id": "CVE-2025-39905",
+        "title": "CVE-2025-39905 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nnet: phylink: add lock for serializing concurrent pl->phydev writes with resolver\n\nCurrently phylink_resolve() protects itself agai"
+      },
+      {
+        "id": "CVE-2025-39910",
+        "title": "CVE-2025-39910 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nmm/vmalloc, mm/kasan: respect gfp mask in kasan_populate_vmalloc()\n\nkasan_populate_vmalloc() and its helpers ignore the caller's gf"
+      },
+      {
+        "id": "CVE-2025-39931",
+        "title": "CVE-2025-39931 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ncrypto: af_alg - Set merge to zero early in af_alg_sendmsg\n\nIf an error causes af_alg_sendmsg to abort, ctx->merge may contain\na ga"
+      },
+      {
+        "id": "CVE-2025-39932",
+        "title": "CVE-2025-39932 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nsmb: client: let smbd_destroy() call disable_work_sync(&info->post_send_credits_work)\n\nIn smbd_destroy() we may destroy the memory "
+      },
+      {
+        "id": "CVE-2025-39933",
+        "title": "CVE-2025-39933 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nsmb: client: let recv_done verify data_offset, data_length and remaining_data_length\n\nThis is inspired by the related server fixes."
+      },
+      {
+        "id": "CVE-2025-39949",
+        "title": "CVE-2025-39949 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nqed: Don't collect too many protection override GRC elements\n\nIn the protection override dump path, the firmware can return far too"
+      },
+      {
+        "id": "CVE-2025-39955",
+        "title": "CVE-2025-39955 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ntcp: Clear tcp_sk(sk)->fastopen_rsk in tcp_disconnect().\n\nsyzbot reported the splat below where a socket had tcp_sk(sk)->fastopen_r"
+      },
+      {
+        "id": "CVE-2025-39966",
+        "title": "CVE-2025-39966 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\niommufd: Fix race during abort for file descriptors\n\nfput() doesn't actually call file_operations release() synchronously, it\nputs "
+      },
+      {
+        "id": "CVE-2025-39968",
+        "title": "CVE-2025-39968 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ni40e: add max boundary check for VF filters\n\nThere is no check for max filters that VF can request. Add it."
+      },
+      {
+        "id": "CVE-2025-39970",
+        "title": "CVE-2025-39970 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ni40e: fix input validation logic for action_meta\n\nFix condition to check 'greater or equal' to prevent OOB dereference."
+      },
+      {
+        "id": "CVE-2025-39971",
+        "title": "CVE-2025-39971 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ni40e: fix idx validation in config queues msg\n\nEnsure idx is within range of active/initialized TCs when iterating over\nvf->ch[idx]"
+      },
+      {
+        "id": "CVE-2025-39973",
+        "title": "CVE-2025-39973 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\ni40e: add validation for ring_len param\n\nThe `ring_len` parameter provided by the virtual function (VF)\nis assigned directly to the"
+      },
+      {
+        "id": "CVE-2025-39980",
+        "title": "CVE-2025-39980 in linux-libc-dev",
+        "severity": "HIGH",
+        "tool": "Trivy",
+        "package": "linux-libc-dev",
+        "description": "In the Linux kernel, the following vulnerability has been resolved:\n\nnexthop: Forbid FDB status change while nexthop is in a group\n\nThe kernel forbids the creation of non-FDB nexthop groups with FDB\nn"
+      }
+    ],
+    "packages_to_update": [
+      "linux-libc-dev",
+      "libldap-common",
+      "tar",
+      "libuuid1",
+      "libc-dev-bin",
+      "pip",
+      "libcurl4t64",
+      "liblastlog2-2",
+      "libgprofng0",
+      "perl-modules-5.40",
+      "login.defs",
+      "mount",
+      "libsmartcols1",
+      "libapt-pkg7.0",
+      "bash",
+      "libsframe1",
+      "passwd",
+      "sysvinit-utils",
+      "libbinutils",
+      "libc-bin",
+      "libudev1",
+      "libk5crypto3",
+      "binutils-common",
+      "libldap2",
+      "util-linux",
+      "libsystemd0",
+      "libkrb5support0",
+      "binutils",
+      "libgnutls30t64",
+      "libtinfo6",
+      "libperl5.40",
+      "libmount1",
+      "krb5-locales",
+      "libctf0",
+      "libgssapi-krb5-2",
+      "bsdutils",
+      "coreutils",
+      "libctf-nobfd0",
+      "bash-completion",
+      "patch",
+      "perl",
+      "starlette",
+      "perl-base",
+      "libsqlite3-0",
+      "ncurses-bin",
+      "libblkid1",
+      "binutils-x86-64-linux-gnu",
+      "libc6",
+      "libncursesw6",
+      "login",
+      "ncurses-base",
+      "libjansson4",
+      "libkrb5-3",
+      "curl",
+      "apt",
+      "libc6-dev"
+    ],
+    "files_with_issues": [
+      "/workspace/reports/trivy-image-scan.json",
+      "/workspace/reports/trivy-report.json",
+      "/workspace/reports/trivy-image-report.json"
+    ],
+    "risk_score": 2394,
+    "risk_level": "CRITICAL"
+  }
+}
