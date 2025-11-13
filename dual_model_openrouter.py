@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Dual-Model Security Policy Generator
+Dual-Model Security Policy Generator via OpenRouter
 Compares DeepSeek R1 and LLaMA 3.3 for generating security policies
-Evaluates model performance and generates comparison report
 """
 
 import os
@@ -13,57 +12,51 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any, Optional
 import requests
-from collections import defaultdict
 
 
-class ModelEvaluator:
-    """Evaluates and compares different LLM models for security policy generation."""
+class DualModelPolicyGenerator:
+    """Generates and compares security policies using multiple models via OpenRouter."""
 
-    def __init__(self, hf_token: str):
-        self.hf_token = hf_token
-        self.base_url = "https://router.huggingface.co/hf-inference/models/"
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
 
         # Model configurations
         self.models = {
             "deepseek": {
-                "id": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+                "id": "deepseek/deepseek-r1",
                 "name": "DeepSeek R1",
-                "type": "Reasoning Model",
-                "max_tokens": 2000,
-                "temperature": 0.7
+                "type": "Reasoning Model"
             },
             "llama": {
-                "id": "meta-llama/Llama-3.3-70B-Instruct",
+                "id": "meta-llama/llama-3.3-70b-instruct",
                 "name": "LLaMA 3.3 70B",
-                "type": "Instruction-Tuned Model",
-                "max_tokens": 2000,
-                "temperature": 0.7
+                "type": "Instruction-Tuned Model"
             }
         }
 
-        self.results = {}
-        self.comparison_metrics = {}
-
     def call_model(self, model_key: str, prompt: str, max_retries: int = 3) -> Optional[Dict[str, Any]]:
-        """Call a specific model and return response with metadata."""
+        """Call a specific model via OpenRouter and return response with metadata."""
         model_config = self.models[model_key]
 
         headers = {
-            "Authorization": f"Bearer {self.hf_token}",
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/devsecops-pipeline",
+            "X-Title": "DevSecOps Security Policy Generator"
         }
 
-        api_url = f"{self.base_url}{model_config['id']}"
-
         payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": model_config["max_tokens"],
-                "temperature": model_config["temperature"],
-                "top_p": 0.95,
-                "do_sample": True,
-                "return_full_text": False
-            }
+            "model": model_config["id"],
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            "max_tokens": 2000,
+            "temperature": 0.7,
+            "top_p": 0.95
         }
 
         start_time = time.time()
@@ -72,19 +65,23 @@ class ModelEvaluator:
             try:
                 print(f"   Calling {model_config['name']} (attempt {attempt + 1}/{max_retries})...")
 
-                response = requests.post(api_url, headers=headers, json=payload, timeout=120)
+                response = requests.post(self.base_url, headers=headers, json=payload, timeout=180)
 
                 if response.status_code == 200:
                     result = response.json()
-
                     response_time = time.time() - start_time
 
-                    if isinstance(result, list) and len(result) > 0:
-                        generated_text = result[0].get("generated_text", "")
-                    elif isinstance(result, dict):
-                        generated_text = result.get("generated_text", "")
-                    else:
-                        generated_text = str(result)
+                    # Extract content from OpenRouter response
+                    generated_text = ""
+                    if "choices" in result and len(result["choices"]) > 0:
+                        message = result["choices"][0].get("message", {})
+                        generated_text = message.get("content", "")
+
+                    if not generated_text:
+                        print(f"   ⚠️  Empty response from model")
+                        if attempt < max_retries - 1:
+                            time.sleep(5)
+                            continue
 
                     return {
                         "success": True,
@@ -93,12 +90,19 @@ class ModelEvaluator:
                         "response": generated_text,
                         "response_time": response_time,
                         "timestamp": datetime.utcnow().isoformat(),
-                        "token_count": len(generated_text.split())
+                        "token_count": len(generated_text.split()),
+                        "usage": result.get("usage", {})
                     }
 
-                elif response.status_code == 503:
-                    wait_time = min(20 * (attempt + 1), 60)
-                    print(f"   Model loading... waiting {wait_time}s")
+                elif response.status_code == 429:
+                    wait_time = min(10 * (attempt + 1), 30)
+                    print(f"   Rate limited... waiting {wait_time}s")
+                    time.sleep(wait_time)
+                    continue
+
+                elif response.status_code in [502, 503]:
+                    wait_time = min(15 * (attempt + 1), 45)
+                    print(f"   Service unavailable... waiting {wait_time}s")
                     time.sleep(wait_time)
                     continue
 
@@ -168,8 +172,8 @@ class ModelEvaluator:
                         })
 
         return {
-            "policies": policies[:10],  # Top 10 policies
-            "recommendations": recommendations[:15],  # Top 15 recommendations
+            "policies": policies[:10],
+            "recommendations": recommendations[:15],
             "raw_response": response_text
         }
 
@@ -189,9 +193,6 @@ class ModelEvaluator:
             "avg_recommendation_length": sum(len(r) for r in recommendations) / max(len(recommendations), 1),
             "structured_output": isinstance(policies, list) and len(policies) > 0,
             "actionable_items": len(policies) + len(recommendations),
-            "specificity_score": 0,
-            "relevance_score": 0,
-            "completeness_score": 0
         }
 
         # Specificity: Check if policies mention specific technologies/CVEs
@@ -200,9 +201,6 @@ class ModelEvaluator:
         metrics["specificity_score"] = min(specificity_count / len(specific_keywords), 1.0) * 100
 
         # Relevance: Check if response addresses vulnerability data
-        vuln_count = vuln_data.get("risk_metrics", {}).get("total", 0)
-        critical_count = vuln_data.get("risk_metrics", {}).get("critical", 0)
-
         relevance_keywords = ['critical', 'vulnerability', 'security', 'risk', 'remediation', 'fix']
         relevance_count = sum(1 for keyword in relevance_keywords if keyword.lower() in raw_response.lower())
         metrics["relevance_score"] = min(relevance_count / len(relevance_keywords), 1.0) * 100
@@ -230,12 +228,13 @@ class ModelEvaluator:
         """Generate security policies using both models and compare."""
 
         print("\n" + "="*70)
-        print("DUAL-MODEL SECURITY POLICY GENERATION")
+        print("DUAL-MODEL SECURITY POLICY GENERATION (via OpenRouter)")
+        print("DeepSeek R1 vs LLaMA 3.3 70B")
         print("="*70)
 
         # Create prompt
         risk_metrics = vuln_data.get("risk_metrics", {})
-        vulnerabilities = vuln_data.get("vulnerabilities", [])[:20]  # Top 20 for context
+        vulnerabilities = vuln_data.get("vulnerabilities", [])[:20]
 
         prompt = f"""You are a cybersecurity expert. Based on the following vulnerability scan results, generate comprehensive security policies and recommendations.
 
@@ -473,16 +472,17 @@ def load_vulnerability_data(data_path: str = "processed/normalized_vulnerabiliti
 def main():
     """Main execution."""
     print("="*70)
-    print("DUAL-MODEL SECURITY POLICY GENERATOR")
-    print("DeepSeek R1 vs LLaMA 3.3 Comparison")
+    print("DUAL-MODEL SECURITY POLICY GENERATOR (via OpenRouter)")
+    print("DeepSeek R1 vs LLaMA 3.3 70B")
     print("="*70)
 
-    # Get HuggingFace token
-    hf_token = os.environ.get('HF_TOKEN', '')
+    # Get OpenRouter API key
+    api_key = os.environ.get('OPENROUTER_API_KEY', '')
 
-    if not hf_token or len(hf_token) < 10:
-        print("❌ Error: Valid HF_TOKEN required")
-        print("   Set environment variable: export HF_TOKEN='your_token'")
+    if not api_key or len(api_key) < 10:
+        print("❌ Error: Valid OPENROUTER_API_KEY required")
+        print("   Set environment variable: export OPENROUTER_API_KEY='your_key'")
+        print("   Get your key at: https://openrouter.ai/keys")
         return 1
 
     # Load vulnerability data
@@ -491,18 +491,18 @@ def main():
     print(f"   Loaded {vuln_data['risk_metrics']['total']} vulnerabilities")
     print(f"   Risk Level: {vuln_data['risk_metrics']['risk_level']}")
 
-    # Initialize evaluator
-    evaluator = ModelEvaluator(hf_token)
+    # Initialize generator
+    generator = DualModelPolicyGenerator(api_key)
 
     # Generate policies with both models
-    results = evaluator.generate_policies_with_both_models(vuln_data)
+    results = generator.generate_policies_with_both_models(vuln_data)
 
     # Generate comparison report
-    comparison = evaluator.generate_comparison_report(results, vuln_data)
+    comparison = generator.generate_comparison_report(results, vuln_data)
 
     # Save all results
     print("\n💾 Saving results...")
-    evaluator.save_results(results, comparison)
+    generator.save_results(results, comparison)
 
     print("\n" + "="*70)
     print("✅ DUAL-MODEL ANALYSIS COMPLETE")

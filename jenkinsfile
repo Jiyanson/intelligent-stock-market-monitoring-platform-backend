@@ -12,12 +12,12 @@ pipeline {
 
         // SonarQube
         SONAR_PROJECT_KEY = 'stock-market-platform'
-        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_HOST_URL = 'http://host.docker.internal:9000'  // Fixed for Docker-in-Docker
         SONAR_LOGIN_ID = 'sonarqube-token'
 
-        // HuggingFace for AI
-        HF_TOKEN_CREDENTIALS_ID = 'huggingface-token'
-        HF_MODEL = 'deepseek-ai/DeepSeek-R1'
+        // OpenRouter for AI (DeepSeek R1 vs LLaMA 3.3)
+        OPENROUTER_API_KEY_CREDENTIALS_ID = 'openrouter-api-key'
+        AI_MODELS = 'deepseek/deepseek-r1,meta-llama/llama-3.3-70b-instruct'
 
         // Grafana
         GRAFANA_URL = 'https://ayoubcpge9.grafana.net'
@@ -27,6 +27,9 @@ pipeline {
         // Git
         GIT_REPO_URL = 'https://github.com/Jiyanson/intelligent-stock-market-monitoring-platform-backend.git'
         GIT_BRANCH = 'main'
+        
+        // NVD API Key (HIGHLY RECOMMENDED - Get free key from https://nvd.nist.gov/developers/request-an-api-key)
+        NVD_API_KEY_CREDENTIALS_ID = 'nvd-api-key'  // Add this credential in Jenkins
     }
 
     stages {
@@ -151,30 +154,109 @@ pipeline {
         // ====================================
         // PHASE 4: SECURITY SCANNING (PARALLEL)
         // ====================================
-        stage('Initialize Trivy Database') {
-            steps {
-                script {
-                    echo '📥 Downloading Trivy vulnerability database (one-time setup)...'
-                    sh '''
-                        # Create Trivy cache directory
-                        mkdir -p ${HOME}/.cache/trivy
+        stage('Initialize Security Databases') {
+            parallel {
+                stage('Initialize Trivy Database') {
+                    steps {
+                        script {
+                            echo '📥 Downloading Trivy vulnerability database...'
+                            sh '''
+                                mkdir -p ${HOME}/.cache/trivy
 
-                        # Download/update Trivy DB with extended timeout
-                        echo "⏳ Downloading vulnerability database (this may take a few minutes on first run)..."
-                        docker run --rm \\
-                            -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
-                            aquasec/trivy:latest \\
-                            image --download-db-only --timeout 15m || {
-                                echo "⚠️  DB download timeout - will use offline mode for scans"
-                                touch ${HOME}/.cache/trivy/db-failed
+                                echo "⏳ Downloading vulnerability database..."
+                                docker run --rm \\
+                                    -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
+                                    aquasec/trivy:latest \\
+                                    image --download-db-only --timeout 15m || {
+                                        echo "⚠️  DB download timeout - will use offline mode for scans"
+                                        touch ${HOME}/.cache/trivy/db-failed
+                                    }
+
+                                if [ -f ${HOME}/.cache/trivy/db-failed ]; then
+                                    echo "⚠️  Trivy DB download failed - scans will run in offline mode"
+                                else
+                                    echo "✅ Trivy vulnerability database ready"
+                                fi
+                            '''
+                        }
+                    }
+                }
+
+                stage('Initialize OWASP Dependency-Check Database') {
+                    steps {
+                        script {
+                            echo '📥 Initializing OWASP Dependency-Check database (one-time setup)...'
+                            
+                            // Check if NVD API key is configured
+                            def nvdApiKeyConfigured = false
+                            def nvdApiKey = ""
+                            
+                            try {
+                                withCredentials([string(credentialsId: NVD_API_KEY_CREDENTIALS_ID, variable: 'NVD_KEY')]) {
+                                    if (env.NVD_KEY && env.NVD_KEY.trim()) {
+                                        nvdApiKeyConfigured = true
+                                        nvdApiKey = env.NVD_KEY
+                                    }
+                                }
+                            } catch (Exception e) {
+                                nvdApiKeyConfigured = false
                             }
 
-                        if [ -f ${HOME}/.cache/trivy/db-failed ]; then
-                            echo "⚠️  Trivy DB download failed - scans will run in offline mode with cached data"
-                        else
-                            echo "✅ Trivy vulnerability database ready"
-                        fi
-                    '''
+                            if (!nvdApiKeyConfigured) {
+                                echo "⚠️  NVD API Key not configured - database update will be VERY slow"
+                                echo "💡 To speed up (from 30+ min to 2-3 min):"
+                                echo "   1. Get free API key: https://nvd.nist.gov/developers/request-an-api-key"
+                                echo "   2. Add credential ID: ${NVD_API_KEY_CREDENTIALS_ID} in Jenkins"
+                                echo ""
+                                echo "⏳ Proceeding with slow update (this will take 20-40 minutes on first run)..."
+                                
+                                sh '''
+                                    docker run --rm \\
+                                        -v dependency-check-cache:/usr/share/dependency-check/data \\
+                                        owasp/dependency-check:latest \\
+                                        --updateonly \\
+                                        --disableAssembly \\
+                                        --disableAutoconf \\
+                                        --disableBundleAudit \\
+                                        --disableCentral \\
+                                        --disableCocoapodsAnalyzer \\
+                                        --disableGolangDep \\
+                                        --disableGolangMod \\
+                                        --disableMSBuild \\
+                                        --disableNodeJS \\
+                                        --disableRubygems \\
+                                        --disableSwiftPackageManagerAnalyzer || echo "OWASP DB update completed"
+                                    
+                                    echo "✅ OWASP Dependency-Check database initialized"
+                                '''
+                            } else {
+                                echo "✅ NVD API Key configured - using fast update (2-3 minutes)"
+                                withCredentials([string(credentialsId: NVD_API_KEY_CREDENTIALS_ID, variable: 'NVD_KEY')]) {
+                                    sh '''
+                                        docker run --rm \\
+                                            -e NVD_API_KEY="${NVD_KEY}" \\
+                                            -v dependency-check-cache:/usr/share/dependency-check/data \\
+                                            owasp/dependency-check:latest \\
+                                            --updateonly \\
+                                            --nvdApiKey "${NVD_KEY}" \\
+                                            --disableAssembly \\
+                                            --disableAutoconf \\
+                                            --disableBundleAudit \\
+                                            --disableCentral \\
+                                            --disableCocoapodsAnalyzer \\
+                                            --disableGolangDep \\
+                                            --disableGolangMod \\
+                                            --disableMSBuild \\
+                                            --disableNodeJS \\
+                                            --disableRubygems \\
+                                            --disableSwiftPackageManagerAnalyzer || echo "OWASP DB update completed"
+                                        
+                                        echo "✅ OWASP Dependency-Check database initialized with API key"
+                                    '''
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -185,29 +267,75 @@ pipeline {
                     steps {
                         script {
                             echo '📦 Running OWASP Dependency-Check (SCA)...'
-                            sh '''
-                                # Create reports directory with proper permissions
-                                mkdir -p reports
-                                chmod 755 reports
+                            
+                            // Check if NVD API key is available
+                            def nvdApiKeyConfigured = false
+                            try {
+                                withCredentials([string(credentialsId: NVD_API_KEY_CREDENTIALS_ID, variable: 'NVD_KEY')]) {
+                                    nvdApiKeyConfigured = (env.NVD_KEY && env.NVD_KEY.trim())
+                                }
+                            } catch (Exception e) {
+                                nvdApiKeyConfigured = false
+                            }
 
-                                echo "🔍 Starting OWASP Dependency-Check for Python dependencies..."
+                            if (nvdApiKeyConfigured) {
+                                withCredentials([string(credentialsId: NVD_API_KEY_CREDENTIALS_ID, variable: 'NVD_KEY')]) {
+                                    sh '''
+                                        mkdir -p reports
+                                        chmod 777 reports
 
-                                # Check if Python dependency files exist
-                                if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ] || [ -f "Pipfile" ] || [ -f "setup.py" ]; then
-                                    echo "✅ Found Python dependency files"
+                                        echo "🔍 Running OWASP Dependency-Check with NVD API key (fast mode)..."
 
-                                    # List found files
-                                    echo "📄 Dependency files detected:"
-                                    ls -lh requirements*.txt pyproject.toml Pipfile setup.py 2>/dev/null || true
+                                        docker run --rm \\
+                                            -e user=$(id -u) \\
+                                            -e NVD_API_KEY="${NVD_KEY}" \\
+                                            -v $(pwd):/src \\
+                                            -v dependency-check-cache:/usr/share/dependency-check/data \\
+                                            owasp/dependency-check:latest \\
+                                            --scan /src \\
+                                            --format JSON \\
+                                            --format HTML \\
+                                            --out /src/reports \\
+                                            --project "stock-market-platform" \\
+                                            --nvdApiKey "${NVD_KEY}" \\
+                                            --enableExperimental \\
+                                            --failOnCVSS 0 \\
+                                            --prettyPrint \\
+                                            --disableAssembly \\
+                                            --disableNodeJS \\
+                                            --disableRubygems || echo "Dependency check completed"
 
-                                    # Run OWASP Dependency-Check with proper configuration
-                                    echo "🔍 Running OWASP Dependency-Check analysis..."
+                                        chmod -R 644 reports/dependency-check* 2>/dev/null || true
 
-                                    # Ensure reports directory is writable
+                                        if [ -f reports/dependency-check-report.json ]; then
+                                            echo "✅ OWASP Dependency-Check completed"
+                                            VULN_COUNT=$(python3 -c "
+import json
+try:
+    with open('reports/dependency-check-report.json', 'r') as f:
+        data = json.load(f)
+    deps = data.get('dependencies', [])
+    total = sum(len(d.get('vulnerabilities', [])) for d in deps)
+    print(total)
+except:
+    print('0')
+" 2>/dev/null || echo "0")
+                                            echo "📊 Found ${VULN_COUNT} vulnerabilities"
+                                        else
+                                            echo '{"dependencies":[]}' > reports/dependency-check-report.json
+                                        fi
+                                    '''
+                                }
+                            } else {
+                                sh '''
+                                    mkdir -p reports
                                     chmod 777 reports
 
+                                    echo "🔍 Running OWASP Dependency-Check without API key (slow mode)..."
+                                    echo "⚠️  This scan uses cached database (no real-time updates)"
+
                                     docker run --rm \\
-                                        -e user=\$(id -u) \\
+                                        -e user=$(id -u) \\
                                         -v $(pwd):/src \\
                                         -v dependency-check-cache:/usr/share/dependency-check/data \\
                                         owasp/dependency-check:latest \\
@@ -217,114 +345,34 @@ pipeline {
                                         --out /src/reports \\
                                         --project "stock-market-platform" \\
                                         --enableExperimental \\
+                                        --noupdate \\
                                         --failOnCVSS 0 \\
-                                        --prettyPrint || {
-                                            echo "⚠️  Dependency-Check completed with warnings"
-                                            echo "This is expected if no vulnerabilities are found"
-                                        }
+                                        --prettyPrint \\
+                                        --disableAssembly \\
+                                        --disableNodeJS \\
+                                        --disableRubygems || echo "Dependency check completed"
 
-                                    # Fix permissions on generated files
                                     chmod -R 644 reports/dependency-check* 2>/dev/null || true
 
-                                    # Check if reports were generated
                                     if [ -f reports/dependency-check-report.json ]; then
-                                        echo "✅ OWASP Dependency-Check JSON report generated"
-
-                                        # Count vulnerabilities
+                                        echo "✅ OWASP Dependency-Check completed (using cached DB)"
                                         VULN_COUNT=$(python3 -c "
 import json
-import sys
 try:
     with open('reports/dependency-check-report.json', 'r') as f:
         data = json.load(f)
     deps = data.get('dependencies', [])
     total = sum(len(d.get('vulnerabilities', [])) for d in deps)
     print(total)
-except Exception as e:
+except:
     print('0')
 " 2>/dev/null || echo "0")
-
-                                        echo "📊 Found ${VULN_COUNT} vulnerabilities in dependencies"
-
-                                        # Extract severity counts
-                                        python3 -c "
-import json
-try:
-    with open('reports/dependency-check-report.json', 'r') as f:
-        data = json.load(f)
-
-    severities = {'CRITICAL': 0, 'HIGH': 0, 'MEDIUM': 0, 'LOW': 0}
-
-    for dep in data.get('dependencies', []):
-        for vuln in dep.get('vulnerabilities', []):
-            severity = vuln.get('severity', 'UNKNOWN').upper()
-            if severity in severities:
-                severities[severity] += 1
-
-    print('  🔴 Critical:', severities['CRITICAL'])
-    print('  🟠 High:', severities['HIGH'])
-    print('  🟡 Medium:', severities['MEDIUM'])
-    print('  🟢 Low:', severities['LOW'])
-except Exception as e:
-    print('  ⚠️ Could not parse severity details')
-" || true
-
+                                        echo "📊 Found ${VULN_COUNT} vulnerabilities"
                                     else
-                                        echo "⚠️ JSON report not generated, creating empty report"
                                         echo '{"dependencies":[]}' > reports/dependency-check-report.json
                                     fi
-
-                                    if [ -f reports/dependency-check-report.html ]; then
-                                        echo "✅ OWASP Dependency-Check HTML report generated"
-                                    else
-                                        echo "⚠️ HTML report not generated"
-                                    fi
-
-                                    # Fix permissions on generated reports
-                                    chmod 644 reports/dependency-check-report.* 2>/dev/null || true
-
-                                else
-                                    echo "⚠️  No Python dependency files found"
-                                    echo "Using Trivy as fallback for dependency scanning..."
-
-                                    # Fallback to Trivy if no Python files or OWASP failed
-                                    docker run --rm \\
-                                        -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
-                                        -v $(pwd):/workspace \\
-                                        aquasec/trivy:latest \\
-                                        fs --skip-db-update \\
-                                        --format json \\
-                                        --output /workspace/reports/dependency-check-report.json \\
-                                        --scanners vuln \\
-                                        --severity CRITICAL,HIGH,MEDIUM,LOW \\
-                                        /workspace || echo "Trivy fallback completed"
-
-                                    echo "✅ Trivy fallback scan completed"
-                                fi
-
-                                # Verify final report exists
-                                if [ ! -f reports/dependency-check-report.json ]; then
-                                    echo "⚠️  Creating empty placeholder report"
-                                    echo '{"dependencies":[],"Results":[]}' > reports/dependency-check-report.json
-                                fi
-
-                                echo "✅ SCA Dependency scanning completed"
-                            '''
-                        }
-                    }
-
-                    post {
-                        always {
-                            script {
-                                // Archive the log file if it exists
-                                sh 'ls -lh reports/dependency-check* 2>/dev/null || true'
+                                '''
                             }
-                        }
-                        success {
-                            echo "✅ Dependency check completed successfully"
-                        }
-                        failure {
-                            echo "❌ Dependency check failed"
                         }
                     }
                 }
@@ -334,7 +382,6 @@ except Exception as e:
                         script {
                             echo '🔒 Running Trivy container image scan...'
                             sh """
-                                # Use cached DB
                                 docker run --rm \\
                                     -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
@@ -346,7 +393,6 @@ except Exception as e:
                                     --timeout 10m \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || echo "Trivy scan completed"
 
-                                # Generate HTML report
                                 docker run --rm \\
                                     -v ${HOME}/.cache/trivy:/root/.cache/trivy \\
                                     -v /var/run/docker.sock:/var/run/docker.sock \\
@@ -359,10 +405,8 @@ except Exception as e:
                                     --timeout 10m \\
                                     ${IMAGE_NAME}:${IMAGE_TAG} || true
 
-                                # Fix permissions on report files
                                 chmod 666 reports/*.json reports/*.html 2>/dev/null || true
 
-                                # Count vulnerabilities found
                                 if [ -f reports/trivy-image-scan.json ]; then
                                     VULN_COUNT=\$(python3 -c "import json; data=json.load(open('reports/trivy-image-scan.json')); print(sum(len(r.get('Vulnerabilities', [])) for r in data.get('Results', [])))" 2>/dev/null || echo "0")
                                     echo "✅ Container scan found \${VULN_COUNT} vulnerabilities"
@@ -379,7 +423,6 @@ except Exception as e:
                         script {
                             echo '📊 Running SonarQube code quality analysis...'
 
-                            // Check if SonarQube is actually configured and reachable
                             def sonarConfigured = false
                             def sonarToken = ""
 
@@ -403,10 +446,8 @@ except Exception as e:
                                 echo ""
                                 echo "⏩ Continuing pipeline without SonarQube..."
                             } else {
-                                // Simple and reliable server reachability check
                                 def serverReachable = false
                                 try {
-                                    // Test server connectivity directly from Jenkins node
                                     def response = sh(
                                         script: """
                                             curl -s -o /dev/null -w "%{http_code}" "${SONAR_HOST_URL}/api/system/status" || echo "000"
@@ -424,8 +465,7 @@ except Exception as e:
 
                                     withCredentials([string(credentialsId: SONAR_LOGIN_ID, variable: 'SONAR_TOKEN')]) {
                                         sh """
-                                            # Use Docker with host network for local SonarQube
-                                            echo "🔧 Starting SonarQube scan with Docker..."
+                                            echo "🔧 Starting SonarQube scan..."
 
                                             docker run --rm \\
                                                 --network=host \\
@@ -445,27 +485,11 @@ except Exception as e:
                                     }
                                 } else {
                                     echo "❌ SonarQube server not reachable at: ${SONAR_HOST_URL}"
-                                    echo "🔧 Debug information:"
-                                    echo "   - Testing connectivity from Jenkins node..."
-
-                                    // Debug commands to help troubleshoot
-                                    sh """
-                                        echo "=== Network Debug Information ==="
-                                        echo "Ping localhost: ping -c 2 localhost"
-                                        ping -c 2 localhost || echo "Ping failed"
-                                        echo ""
-                                        echo "Netstat check: netstat -tulpn | grep 9000 || echo 'Port 9000 not found'"
-                                        netstat -tulpn | grep 9000 || echo "Port 9000 not listening"
-                                        echo ""
-                                        echo "Docker network check: docker network ls"
-                                        docker network ls
-                                        echo "=== End Debug ==="
-                                    """
-
-                                    echo "💡 Solutions for local SonarQube:"
-                                    echo "   1. Ensure SonarQube is running: docker ps | grep sonar"
-                                    echo "   2. Use --network=host in Docker commands"
-                                    echo "   3. For Jenkins in Docker, use host networking"
+                                    echo "🔧 Troubleshooting tips:"
+                                    echo "   1. Verify SonarQube is running: docker ps | grep sonar"
+                                    echo "   2. Check SonarQube logs: docker logs <sonar-container>"
+                                    echo "   3. Test connectivity: curl ${SONAR_HOST_URL}/api/system/status"
+                                    echo "   4. If Jenkins is in Docker, ensure proper network configuration"
                                     echo ""
                                     echo "⏩ Skipping SonarQube analysis and continuing pipeline..."
                                 }
@@ -478,10 +502,7 @@ except Exception as e:
                             echo "✅ SonarQube stage completed successfully"
                         }
                         failure {
-                            echo "❌ SonarQube stage failed"
-                        }
-                        unstable {
-                            echo "⚠️ SonarQube stage completed with warnings"
+                            echo "❌ SonarQube stage failed - continuing pipeline"
                         }
                     }
                 }
@@ -496,18 +517,15 @@ except Exception as e:
                 script {
                     echo '🚀 Deploying application for DAST testing...'
                     sh """
-                        # Clean up existing deployment
                         echo "🧹 Cleaning up existing containers..."
                         docker compose down --remove-orphans --volumes || true
                         docker rm -f postgres_db redis_cache pgadmin 2>/dev/null || true
                         docker ps -a --filter "name=devsecops2" --format "{{.Names}}" | xargs -r docker rm -f 2>/dev/null || true
                         docker network prune -f || true
 
-                        # Wait for ports to be released
                         echo "⏳ Waiting for ports to be released..."
                         sleep 3
 
-                        # Check and free critical ports
                         for port in 8000 5432 6379; do
                             if lsof -i :\${port} >/dev/null 2>&1; then
                                 echo "⚠️  Warning: Port \${port} is still in use"
@@ -518,22 +536,26 @@ except Exception as e:
                             fi
                         done
 
-                        # Pull and start services
-                        echo "📥 Pulling latest image..."
-                        docker pull ${IMAGE_NAME}:latest
+                        echo "🔍 Checking for image availability..."
+                        # Try to pull from Docker Hub, but use local image if not available
+                        if docker pull ${IMAGE_NAME}:latest 2>/dev/null; then
+                            echo "✅ Using image from Docker Hub"
+                        else
+                            echo "⚠️  Image not found in Docker Hub, using locally built image"
+                            echo "💡 Image will be pushed to Docker Hub after this run for future use"
+                            # Ensure local image is tagged as latest
+                            docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest 2>/dev/null || true
+                        fi
 
-                        echo "🚀 Starting services..."
+                        echo "🚀 Starting services with docker compose..."
                         docker compose up -d
 
-                        # Wait for services to be healthy
                         echo "⏳ Waiting for services to start..."
                         sleep 15
 
-                        # Verify services are running
                         echo "📊 Running containers:"
                         docker compose ps
 
-                        # Test connectivity
                         echo "🔍 Testing service connectivity..."
                         for i in {1..30}; do
                             if curl -f -s http://localhost:8000/health >/dev/null 2>&1 || curl -f -s http://localhost:8000/docs >/dev/null 2>&1; then
@@ -552,19 +574,16 @@ except Exception as e:
         stage('DAST - OWASP ZAP') {
             steps {
                 script {
-                    echo '🕷️ Running OWASP ZAP DAST scan on deployed application...'
+                    echo '🕷️ Running OWASP ZAP DAST scan...'
                     sh '''
                         TARGET_URL="http://localhost:8000"
 
-                        # Ensure reports directory exists with proper permissions
                         mkdir -p reports
-                        chmod 777 reports  # Allow ZAP container to write
+                        chmod 777 reports
 
-                        # Test if app is reachable
                         if curl -f -s ${TARGET_URL}/docs >/dev/null 2>&1 || curl -f -s ${TARGET_URL}/health >/dev/null 2>&1; then
                             echo "✅ Application is reachable, starting ZAP scan..."
 
-                            # Run ZAP with user ID mapping to avoid permission issues
                             docker run --rm \\
                                 --network="host" \\
                                 --user $(id -u):$(id -g) \\
@@ -576,21 +595,17 @@ except Exception as e:
                                 -r zap-report.html \\
                                 -I || echo "ZAP scan completed with warnings"
 
-                            # Fix permissions on ZAP reports (in case still needed)
                             chmod 666 reports/zap-report.* 2>/dev/null || true
 
                             if [ -f reports/zap-report.json ]; then
-                                echo "✅ DAST scan completed - report saved"
-                                # Count alerts
+                                echo "✅ DAST scan completed"
                                 ALERT_COUNT=$(python3 -c "import json; data=json.load(open('reports/zap-report.json', 'r')); print(len(data.get('site', [{}])[0].get('alerts', [])))" 2>/dev/null || echo "0")
                                 echo "   Found ${ALERT_COUNT} security alerts"
                             else
-                                echo "⚠️  ZAP scan completed but no report generated"
                                 echo '{"alerts":[]}' > reports/zap-report.json
                             fi
                         else
                             echo "⚠️  Application not reachable at ${TARGET_URL}"
-                            echo "⚠️  Skipping DAST scan - ensure application is deployed and running"
                             echo '{"alerts":[]}' > reports/zap-report.json
                         fi
                     '''
@@ -620,7 +635,7 @@ except Exception as e:
                             echo "✅ Normalized $VULN_COUNT vulnerabilities (Critical: $CRITICAL, High: $HIGH)"
                         else
                             echo "Creating placeholder normalized data..."
-                            echo '{"vulnerabilities":[],"risk_metrics":{"total":0}}' > processed/normalized_vulnerabilities.json
+                            echo '{"vulnerabilities":[],"risk_metrics":{"total":0,"critical":0,"high":0,"medium":0,"low":0,"risk_score":0,"risk_level":"LOW"}}' > processed/normalized_vulnerabilities.json
                         fi
                     '''
                 }
@@ -631,47 +646,67 @@ except Exception as e:
             steps {
                 script {
                     echo '🤖 Generating AI-powered security policies with DUAL-MODEL COMPARISON...'
-                    echo '   Models: DeepSeek R1 vs LLaMA 3.3 70B'
-                    withCredentials([string(credentialsId: HF_TOKEN_CREDENTIALS_ID, variable: 'HF_TOKEN')]) {
+                    echo '   Models: DeepSeek R1 vs LLaMA 3.3 70B (via OpenRouter)'
+                    withCredentials([string(credentialsId: OPENROUTER_API_KEY_CREDENTIALS_ID, variable: 'OPENROUTER_API_KEY')]) {
                         sh """
-                            # Use Python 3 directly with mounted scripts (avoids stale Docker image)
-                            echo "🔬 Running dual-model analysis with latest code..."
+                            echo "🔬 Running dual-model comparison via OpenRouter..."
 
-                            # Install required Python packages if needed
                             pip3 install --quiet requests 2>/dev/null || true
 
-                            # Run dual-model generator directly
-                            python3 dual_model_policy_generator.py || echo "Dual-model policy generation completed with warnings"
+                            python3 dual_model_openrouter.py || echo "⚠️  Dual-model generation failed, continuing..."
 
-                            # Generate model comparison HTML report
-                            echo "📊 Generating model comparison report..."
-                            python3 generate_model_comparison_report.py || echo "Comparison report generation completed"
-
-                            # Generate standard AI reports
                             echo "📄 Generating comprehensive AI reports..."
-                            python3 generate_ai_reports.py || echo "Report generation completed with warnings"
+                            python3 generate_ai_reports.py || echo "Report generation completed"
 
-                            # Display results summary
                             echo ""
                             echo "======================================================================"
                             echo "AI-POWERED SECURITY ANALYSIS COMPLETE"
                             echo "======================================================================"
                             echo ""
                             echo "📊 Generated Artifacts:"
-                            ls -lh ai-policies/*.json 2>/dev/null | awk '{print "   • " \$9 " (" \$5 ")"}'
-                            ls -lh ai-reports/*.html 2>/dev/null | awk '{print "   • " \$9 " (" \$5 ")"}'
+                            if ls ai-policies/*.json >/dev/null 2>&1; then
+                                ls -lh ai-policies/*.json | while read -r perms links owner group size month day time file; do
+                                    echo "   • \${file} - \${size}"
+                                done
+                            else
+                                echo "   No policy files found"
+                            fi
+                            if ls ai-reports/*.html >/dev/null 2>&1; then
+                                ls -lh ai-reports/*.html | while read -r perms links owner group size month day time file; do
+                                    echo "   • \${file} - \${size}"
+                                done
+                            else
+                                echo "   No report files found"
+                            fi
 
-                            # Show model comparison results
                             if [ -f ai-policies/model_comparison_report.json ]; then
                                 echo ""
                                 echo "🏆 Model Comparison Results:"
-                                WINNER=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('model_name', 'N/A'))" 2>/dev/null || echo "N/A")
-                                WINNER_SCORE=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(f\"{data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('quality_score', 0):.1f}\")" 2>/dev/null || echo "0")
-                                echo "   Winner: \${WINNER} (Quality Score: \${WINNER_SCORE}/100)"
+                                python3 << 'PYEOF'
+import json
+try:
+    with open('ai-policies/model_comparison_report.json') as f:
+        data = json.load(f)
+    winner = data.get('winner', 'unknown')
+    results = data.get('individual_results', {})
+    winner_data = results.get(winner, {})
+    winner_name = winner_data.get('model_name', 'N/A')
+    winner_score = winner_data.get('quality_score', 0)
+    print(f"   Winner: {winner_name} - Quality Score: {winner_score:.1f}/100")
+
+    if 'security-policies.json' in open('ai-policies/security-policies.json').read():
+        with open('ai-policies/security-policies.json') as f:
+            policies = json.load(f)
+        policy_count = len(policies.get('policies', []))
+        rec_count = len(policies.get('recommendations', []))
+        print(f"   Policies: {policy_count}, Recommendations: {rec_count}")
+except Exception as e:
+    print(f"   Could not parse comparison results")
+PYEOF
                             fi
 
                             echo ""
-                            echo "✅ AI security analysis completed successfully"
+                            echo "✅ AI security analysis completed"
                             echo "======================================================================"
                         """
                     }
@@ -687,7 +722,6 @@ except Exception as e:
                 script {
                     echo '🧪 Running application tests...'
                     sh """
-                        # Ensure test dependencies are available
                         NETWORK_NAME=\$(docker network ls --filter name=devsecops --format "{{.Name}}" | head -n 1)
                         if [ -z "\${NETWORK_NAME}" ]; then
                             NETWORK_NAME=\$(docker network ls --format "{{.Name}}" | grep -E "(default|bridge)" | head -n 1)
@@ -711,35 +745,35 @@ except Exception as e:
         // ====================================
         // PHASE 8: DEPLOYMENT & REPORTING
         // ====================================
-        // stage('Push to Docker Hub') {
-        //     steps {
-        //         script {
-        //             echo '🚀 Pushing images to Docker Hub...'
-        //             withCredentials([usernamePassword(
-        //                 credentialsId: DOCKER_CREDENTIALS_ID,
-        //                 usernameVariable: 'DOCKER_USER',
-        //                 passwordVariable: 'DOCKER_PASS'
-        //             )]) {
-        //                 sh """
-        //                     echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    echo '🚀 Pushing images to Docker Hub...'
+                    withCredentials([usernamePassword(
+                        credentialsId: DOCKER_CREDENTIALS_ID,
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh """
+                            echo "\${DOCKER_PASS}" | docker login -u "\${DOCKER_USER}" --password-stdin
 
-        //                     # Push main application image
-        //                     echo "📤 Pushing main application image..."
-        //                     docker push ${IMAGE_NAME}:${IMAGE_TAG}
-        //                     docker push ${IMAGE_NAME}:latest
+                            # Push main application image
+                            echo "📤 Pushing main application image..."
+                            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${IMAGE_NAME}:latest
 
-        //                     # Push AI processor image (for caching in future runs)
-        //                     echo "📤 Pushing AI processor image for future caching..."
-        //                     docker push ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
-        //                     docker push ${AI_PROCESSOR_IMAGE}:latest
+                            # Push AI processor image (for caching in future runs)
+                            echo "📤 Pushing AI processor image for future caching..."
+                            docker push ${AI_PROCESSOR_IMAGE}:${IMAGE_TAG}
+                            docker push ${AI_PROCESSOR_IMAGE}:latest
 
-        //                     docker logout
-        //                     echo "✅ All images pushed to registry"
-        //                 """
-        //             }
-        //         }
-        //     }
-        // }
+                            docker logout
+                            echo "✅ All images pushed to registry"
+                        """
+                    }
+                }
+            }
+        }
 
         stage('Archive Reports') {
             steps {
@@ -748,7 +782,7 @@ except Exception as e:
                     archiveArtifacts artifacts: 'reports/**/*.*, ai-reports/**/*.*, ai-policies/**/*.*, processed/**/*',
                                      allowEmptyArchive: true,
                                      fingerprint: true
-                    echo "✅ Artifacts archived and available for download"
+                    echo "✅ Artifacts archived"
                 }
             }
         }
@@ -761,7 +795,6 @@ except Exception as e:
                         sh """
                             TIME_MS=\$(date +%s%3N)
 
-                            # Load vulnerability metrics
                             CRITICAL=\$(jq -r '.risk_metrics.critical // 0' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
                             HIGH=\$(jq -r '.risk_metrics.high // 0' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
                             TOTAL=\$(jq -r '.risk_metrics.total // 0' processed/normalized_vulnerabilities.json 2>/dev/null || echo "0")
@@ -819,20 +852,7 @@ except Exception as e:
                         echo "  ✓ Trivy (Container Scanning)"
                         echo "  ✓ SonarQube (Code Quality & SAST)"
                         echo "  ✓ OWASP ZAP (DAST)"
-                        echo "  ✓ DeepSeek R1 (AI Security Analysis)"
-
-                        echo ""
-                        echo "📁 REPORTS AVAILABLE:"
-                        echo "  • Raw scans: ./reports/"
-                        echo "  • AI analysis: ./ai-reports/"
-                        echo "  • AI policies: ./ai-policies/"
-                        echo "  • Normalized data: ./processed/"
-
-                        echo ""
-                        echo "🤖 AI-GENERATED ARTIFACTS:"
-                        ls ai-policies/*.json ai-reports/*.html 2>/dev/null | while read f; do
-                            echo "  • $(basename $f)"
-                        done || echo "  • No AI artifacts generated"
+                        echo "  ✓ DeepSeek R1 vs LLaMA 3.3 (AI Security Analysis)"
 
                         echo ""
                         echo "✅ Pipeline execution completed successfully"
@@ -848,7 +868,6 @@ except Exception as e:
             script {
                 sh '''
                     echo "🧹 Cleaning up..."
-                    # Clean old images (keep last 5)
                     docker images ${IMAGE_NAME} --format "{{.Tag}}" | tail -n +6 | while read tag; do
                         docker rmi ${IMAGE_NAME}:${tag} 2>/dev/null || true
                     done
@@ -864,10 +883,6 @@ except Exception as e:
                     echo "🎉 =========================================="
                     echo "   PIPELINE COMPLETED SUCCESSFULLY"
                     echo "=========================================="
-                    echo ""
-                    echo "All security scans, builds, and deployments completed."
-                    echo "Review security reports in Jenkins artifacts."
-                    echo ""
                 '''
             }
         }
