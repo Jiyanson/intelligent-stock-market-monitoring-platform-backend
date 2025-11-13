@@ -1,0 +1,1407 @@
+{
+  "SchemaVersion": 2,
+  "CreatedAt": "2025-11-11T09:14:57.533499388Z",
+  "ArtifactName": "/workspace",
+  "ArtifactType": "filesystem",
+  "Metadata": {
+    "RepoURL": "https://github.com/Jiyanson/intelligent-stock-market-monitoring-platform-backend.git/",
+    "Commit": "1dd0721da6fd0575046f02d9113a7ba683650270",
+    "CommitMsg": "FIX JENKINS3",
+    "Author": "Jiyanson \u003cayoubakour2004@gmail.com\u003e",
+    "Committer": "Jiyanson \u003cayoubakour2004@gmail.com\u003e"
+  },
+  "Results": [
+    {
+      "Target": "Pipfile.lock",
+      "Class": "lang-pkgs",
+      "Type": "pipenv",
+      "Packages": [
+        {
+          "Name": "alembic",
+          "Identifier": {
+            "PURL": "pkg:pypi/alembic@1.16.4",
+            "UID": "34121090e6088046"
+          },
+          "Version": "1.16.4",
+          "Locations": [
+            {
+              "StartLine": 19,
+              "EndLine": 26
+            }
+          ]
+        },
+        {
+          "Name": "amqp",
+          "Identifier": {
+            "PURL": "pkg:pypi/amqp@5.3.1",
+            "UID": "5070cf5ef5a5ec75"
+          },
+          "Version": "5.3.1",
+          "Locations": [
+            {
+              "StartLine": 27,
+              "EndLine": 34
+            }
+          ]
+        },
+        {
+          "Name": "annotated-types",
+          "Identifier": {
+            "PURL": "pkg:pypi/annotated-types@0.7.0",
+            "UID": "d1e7413352fe7739"
+          },
+          "Version": "0.7.0",
+          "Locations": [
+            {
+              "StartLine": 35,
+              "EndLine": 42
+            }
+          ]
+        },
+        {
+          "Name": "anyio",
+          "Identifier": {
+            "PURL": "pkg:pypi/anyio@4.9.0",
+            "UID": "734c15a4682c8308"
+          },
+          "Version": "4.9.0",
+          "Locations": [
+            {
+              "StartLine": 43,
+              "EndLine": 50
+            }
+          ]
+        },
+        {
+          "Name": "async-timeout",
+          "Identifier": {
+            "PURL": "pkg:pypi/async-timeout@5.0.1",
+            "UID": "ce2a32496cb659f5"
+          },
+          "Version": "5.0.1",
+          "Locations": [
+            {
+              "StartLine": 51,
+              "EndLine": 58
+            }
+          ]
+        },
+        {
+          "Name": "billiard",
+          "Identifier": {
+            "PURL": "pkg:pypi/billiard@4.2.1",
+            "UID": "4bc867a7a3bd088c"
+          },
+          "Version": "4.2.1",
+          "Locations": [
+            {
+              "StartLine": 59,
+              "EndLine": 66
+            }
+          ]
+        },
+        {
+          "Name": "celery",
+          "Identifier": {
+            "PURL": "pkg:pypi/celery@5.5.3",
+            "UID": "b35fd4590776579d"
+          },
+          "Version": "5.5.3",
+          "Locations": [
+            {
+              "StartLine": 67,
+              "EndLine": 74
+            }
+          ]
+        },
+        {
+          "Name": "click",
+          "Identifier": {
+            "PURL": "pkg:pypi/click@8.2.1",
+            "UID": "5a4b132056cfd017"
+          },
+          "Version": "8.2.1",
+          "Locations": [
+            {
+              "StartLine": 75,
+              "EndLine": 82
+            }
+          ]
+        },
+        {
+          "Name": "click-didyoumean",
+          "Identifier": {
+            "PURL": "pkg:pypi/click-didyoumean@0.3.1",
+            "UID": "89548904207306e8"
+          },
+          "Version": "0.3.1",
+          "Locations": [
+            {
+              "StartLine": 83,
+              "EndLine": 90
+            }
+          ]
+        },
+        {
+          "Name": "click-plugins",
+          "Identifier": {
+            "PURL": "pkg:pypi/click-plugins@1.1.1.2",
+            "UID": "b815a618dc0f2ab5"
+          },
+          "Version": "1.1.1.2",
+          "Locations": [
+            {
+              "StartLine": 91,
+              "EndLine": 97
+            }
+          ]
+        },
+        {
+          "Name": "click-repl",
+          "Identifier": {
+            "PURL": "pkg:pypi/click-repl@0.3.0",
+            "UID": "773c49884e59d5c2"
+          },
+          "Version": "0.3.0",
+          "Locations": [
+            {
+              "StartLine": 98,
+              "EndLine": 105
+            }
+          ]
+        },
+        {
+          "Name": "exceptiongroup",
+          "Identifier": {
+            "PURL": "pkg:pypi/exceptiongroup@1.3.0",
+            "UID": "ae048f6f3299bd3f"
+          },
+          "Version": "1.3.0",
+          "Locations": [
+            {
+              "StartLine": 106,
+              "EndLine": 113
+            }
+          ]
+        },
+        {
+          "Name": "fastapi",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi@0.116.1",
+            "UID": "f9d14fe346f0242c"
+          },
+          "Version": "0.116.1",
+          "Locations": [
+            {
+              "StartLine": 114,
+              "EndLine": 121
+            }
+          ]
+        },
+        {
+          "Name": "greenlet",
+          "Identifier": {
+            "PURL": "pkg:pypi/greenlet@3.2.3",
+            "UID": "f5e9c75e7dec629d"
+          },
+          "Version": "3.2.3",
+          "Locations": [
+            {
+              "StartLine": 122,
+              "EndLine": 181
+            }
+          ]
+        },
+        {
+          "Name": "h11",
+          "Identifier": {
+            "PURL": "pkg:pypi/h11@0.16.0",
+            "UID": "adb6d1738f6087d2"
+          },
+          "Version": "0.16.0",
+          "Locations": [
+            {
+              "StartLine": 182,
+              "EndLine": 189
+            }
+          ]
+        },
+        {
+          "Name": "idna",
+          "Identifier": {
+            "PURL": "pkg:pypi/idna@3.10",
+            "UID": "c6f6a47d324e1f19"
+          },
+          "Version": "3.10",
+          "Locations": [
+            {
+              "StartLine": 190,
+              "EndLine": 197
+            }
+          ]
+        },
+        {
+          "Name": "kombu",
+          "Identifier": {
+            "PURL": "pkg:pypi/kombu@5.5.4",
+            "UID": "5b23d673d8f93c58"
+          },
+          "Version": "5.5.4",
+          "Locations": [
+            {
+              "StartLine": 198,
+              "EndLine": 205
+            }
+          ]
+        },
+        {
+          "Name": "mako",
+          "Identifier": {
+            "PURL": "pkg:pypi/mako@1.3.10",
+            "UID": "6881b7e4e5130166"
+          },
+          "Version": "1.3.10",
+          "Locations": [
+            {
+              "StartLine": 206,
+              "EndLine": 213
+            }
+          ]
+        },
+        {
+          "Name": "markupsafe",
+          "Identifier": {
+            "PURL": "pkg:pypi/markupsafe@3.0.2",
+            "UID": "33570ff7e5b8162c"
+          },
+          "Version": "3.0.2",
+          "Locations": [
+            {
+              "StartLine": 214,
+              "EndLine": 280
+            }
+          ]
+        },
+        {
+          "Name": "packaging",
+          "Identifier": {
+            "PURL": "pkg:pypi/packaging@25.0",
+            "UID": "37b5c90f1b56b266"
+          },
+          "Version": "25.0",
+          "Locations": [
+            {
+              "StartLine": 281,
+              "EndLine": 288
+            }
+          ]
+        },
+        {
+          "Name": "prompt-toolkit",
+          "Identifier": {
+            "PURL": "pkg:pypi/prompt-toolkit@3.0.51",
+            "UID": "2f86eb9bf02d1a5b"
+          },
+          "Version": "3.0.51",
+          "Locations": [
+            {
+              "StartLine": 289,
+              "EndLine": 296
+            }
+          ]
+        },
+        {
+          "Name": "psycopg2-binary",
+          "Identifier": {
+            "PURL": "pkg:pypi/psycopg2-binary@2.9.10",
+            "UID": "2339864951de26c8"
+          },
+          "Version": "2.9.10",
+          "Locations": [
+            {
+              "StartLine": 297,
+              "EndLine": 370
+            }
+          ]
+        },
+        {
+          "Name": "pydantic",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic@2.11.7",
+            "UID": "9222bf3918eaeefd"
+          },
+          "Version": "2.11.7",
+          "Locations": [
+            {
+              "StartLine": 371,
+              "EndLine": 378
+            }
+          ]
+        },
+        {
+          "Name": "pydantic-core",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic-core@2.33.2",
+            "UID": "9900e5cb1b4e147b"
+          },
+          "Version": "2.33.2",
+          "Locations": [
+            {
+              "StartLine": 379,
+              "EndLine": 483
+            }
+          ]
+        },
+        {
+          "Name": "pydantic-settings",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic-settings@2.10.1",
+            "UID": "585644f37a4efa70"
+          },
+          "Version": "2.10.1",
+          "Locations": [
+            {
+              "StartLine": 484,
+              "EndLine": 491
+            }
+          ]
+        },
+        {
+          "Name": "python-dateutil",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dateutil@2.9.0.post0",
+            "UID": "c0202fa4298c7c8d"
+          },
+          "Version": "2.9.0.post0",
+          "Locations": [
+            {
+              "StartLine": 492,
+              "EndLine": 499
+            }
+          ]
+        },
+        {
+          "Name": "python-dotenv",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dotenv@1.1.1",
+            "UID": "d459f4b03281ad1"
+          },
+          "Version": "1.1.1",
+          "Locations": [
+            {
+              "StartLine": 500,
+              "EndLine": 507
+            }
+          ]
+        },
+        {
+          "Name": "redis",
+          "Identifier": {
+            "PURL": "pkg:pypi/redis@6.2.0",
+            "UID": "9ed65f722cbe2310"
+          },
+          "Version": "6.2.0",
+          "Locations": [
+            {
+              "StartLine": 508,
+              "EndLine": 515
+            }
+          ]
+        },
+        {
+          "Name": "six",
+          "Identifier": {
+            "PURL": "pkg:pypi/six@1.17.0",
+            "UID": "275eb24df4c9eb4e"
+          },
+          "Version": "1.17.0",
+          "Locations": [
+            {
+              "StartLine": 516,
+              "EndLine": 523
+            }
+          ]
+        },
+        {
+          "Name": "sniffio",
+          "Identifier": {
+            "PURL": "pkg:pypi/sniffio@1.3.1",
+            "UID": "509a7abe7ac9fdbc"
+          },
+          "Version": "1.3.1",
+          "Locations": [
+            {
+              "StartLine": 524,
+              "EndLine": 531
+            }
+          ]
+        },
+        {
+          "Name": "sqlalchemy",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlalchemy@2.0.42",
+            "UID": "2b77f3a855c9d312"
+          },
+          "Version": "2.0.42",
+          "Locations": [
+            {
+              "StartLine": 532,
+              "EndLine": 594
+            }
+          ]
+        },
+        {
+          "Name": "starlette",
+          "Identifier": {
+            "PURL": "pkg:pypi/starlette@0.47.2",
+            "UID": "9cccd655d922c369"
+          },
+          "Version": "0.47.2",
+          "Locations": [
+            {
+              "StartLine": 595,
+              "EndLine": 602
+            }
+          ]
+        },
+        {
+          "Name": "tomli",
+          "Identifier": {
+            "PURL": "pkg:pypi/tomli@2.2.1",
+            "UID": "71f2d15be0ca12cc"
+          },
+          "Version": "2.2.1",
+          "Locations": [
+            {
+              "StartLine": 603,
+              "EndLine": 640
+            }
+          ]
+        },
+        {
+          "Name": "typing-extensions",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-extensions@4.14.1",
+            "UID": "9aa422a7c1e9abf7"
+          },
+          "Version": "4.14.1",
+          "Locations": [
+            {
+              "StartLine": 641,
+              "EndLine": 648
+            }
+          ]
+        },
+        {
+          "Name": "typing-inspection",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-inspection@0.4.1",
+            "UID": "c9415281b029eb75"
+          },
+          "Version": "0.4.1",
+          "Locations": [
+            {
+              "StartLine": 649,
+              "EndLine": 656
+            }
+          ]
+        },
+        {
+          "Name": "tzdata",
+          "Identifier": {
+            "PURL": "pkg:pypi/tzdata@2025.2",
+            "UID": "c0ae6f4c7ef183fb"
+          },
+          "Version": "2025.2",
+          "Locations": [
+            {
+              "StartLine": 657,
+              "EndLine": 664
+            }
+          ]
+        },
+        {
+          "Name": "uvicorn",
+          "Identifier": {
+            "PURL": "pkg:pypi/uvicorn@0.35.0",
+            "UID": "3ab8fb43a7ad1232"
+          },
+          "Version": "0.35.0",
+          "Locations": [
+            {
+              "StartLine": 665,
+              "EndLine": 672
+            }
+          ]
+        },
+        {
+          "Name": "vine",
+          "Identifier": {
+            "PURL": "pkg:pypi/vine@5.1.0",
+            "UID": "794be30341225c56"
+          },
+          "Version": "5.1.0",
+          "Locations": [
+            {
+              "StartLine": 673,
+              "EndLine": 680
+            }
+          ]
+        },
+        {
+          "Name": "wcwidth",
+          "Identifier": {
+            "PURL": "pkg:pypi/wcwidth@0.2.13",
+            "UID": "5ce13f49d3b04204"
+          },
+          "Version": "0.2.13",
+          "Locations": [
+            {
+              "StartLine": 681,
+              "EndLine": 687
+            }
+          ]
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2025-62727",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.47.2",
+            "UID": "9cccd655d922c369"
+          },
+          "InstalledVersion": "0.47.2",
+          "FixedVersion": "0.49.1",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-62727",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "starlette: Starlette DoS via Range header merging",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. Starting in version 0.39.0 and prior to version 0.49.1 , an unauthenticated attacker can send a crafted HTTP Range header that triggers quadratic-time processing in Starlette's FileResponse Range parsing/merging logic. This enables CPU exhaustion per request, causing denial‑of‑service for endpoints serving files (e.g., StaticFiles or any use of FileResponse). This vulnerability is fixed in 0.49.1.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-407"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2025-62727",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/commit/4ea6e22b489ec388d6004cfbca52dd5b147127c5",
+            "https://github.com/Kludex/starlette/commit/69ed26a85956ef4bd0161807eb27abf49be7cd3c",
+            "https://github.com/Kludex/starlette/releases/tag/0.49.1",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-7f5h-v6xp-fcq8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-62727",
+            "https://www.cve.org/CVERecord?id=CVE-2025-62727"
+          ],
+          "PublishedDate": "2025-10-28T21:15:40.447Z",
+          "LastModifiedDate": "2025-11-04T18:16:45.48Z"
+        }
+      ]
+    },
+    {
+      "Target": "requirements.txt",
+      "Class": "lang-pkgs",
+      "Type": "pip",
+      "Packages": [
+        {
+          "Name": "alembic",
+          "Identifier": {
+            "PURL": "pkg:pypi/alembic@1.16.4",
+            "UID": "943321a9e85c0be1"
+          },
+          "Version": "1.16.4",
+          "Locations": [
+            {
+              "StartLine": 2,
+              "EndLine": 2
+            }
+          ]
+        },
+        {
+          "Name": "amqp",
+          "Identifier": {
+            "PURL": "pkg:pypi/amqp@5.3.1",
+            "UID": "2eb09e68cb8fd086"
+          },
+          "Version": "5.3.1",
+          "Locations": [
+            {
+              "StartLine": 3,
+              "EndLine": 3
+            }
+          ]
+        },
+        {
+          "Name": "annotated-types",
+          "Identifier": {
+            "PURL": "pkg:pypi/annotated-types@0.7.0",
+            "UID": "cc61bd16b565b256"
+          },
+          "Version": "0.7.0",
+          "Locations": [
+            {
+              "StartLine": 4,
+              "EndLine": 4
+            }
+          ]
+        },
+        {
+          "Name": "anyio",
+          "Identifier": {
+            "PURL": "pkg:pypi/anyio@4.9.0",
+            "UID": "7d735a172e5b6927"
+          },
+          "Version": "4.9.0",
+          "Locations": [
+            {
+              "StartLine": 45,
+              "EndLine": 45
+            }
+          ]
+        },
+        {
+          "Name": "anyio",
+          "Identifier": {
+            "PURL": "pkg:pypi/anyio@4.9.0",
+            "UID": "892eb72bb4745da8"
+          },
+          "Version": "4.9.0",
+          "Locations": [
+            {
+              "StartLine": 5,
+              "EndLine": 5
+            }
+          ]
+        },
+        {
+          "Name": "argon2-cffi",
+          "Identifier": {
+            "PURL": "pkg:pypi/argon2-cffi@23.1.0",
+            "UID": "40baf814c3e9a16e"
+          },
+          "Version": "23.1.0",
+          "Locations": [
+            {
+              "StartLine": 46,
+              "EndLine": 46
+            }
+          ]
+        },
+        {
+          "Name": "argon2-cffi-bindings",
+          "Identifier": {
+            "PURL": "pkg:pypi/argon2-cffi-bindings@25.1.0",
+            "UID": "92dd0c0a6c262b99"
+          },
+          "Version": "25.1.0",
+          "Locations": [
+            {
+              "StartLine": 47,
+              "EndLine": 47
+            }
+          ]
+        },
+        {
+          "Name": "async-timeout",
+          "Identifier": {
+            "PURL": "pkg:pypi/async-timeout@5.0.1",
+            "UID": "bac88e971ba170df"
+          },
+          "Version": "5.0.1",
+          "Locations": [
+            {
+              "StartLine": 6,
+              "EndLine": 6
+            }
+          ]
+        },
+        {
+          "Name": "bcrypt",
+          "Identifier": {
+            "PURL": "pkg:pypi/bcrypt@4.3.0",
+            "UID": "b7af83e6ec395369"
+          },
+          "Version": "4.3.0",
+          "Locations": [
+            {
+              "StartLine": 48,
+              "EndLine": 48
+            }
+          ]
+        },
+        {
+          "Name": "billiard",
+          "Identifier": {
+            "PURL": "pkg:pypi/billiard@4.2.1",
+            "UID": "411717f2e886100c"
+          },
+          "Version": "4.2.1",
+          "Locations": [
+            {
+              "StartLine": 7,
+              "EndLine": 7
+            }
+          ]
+        },
+        {
+          "Name": "celery",
+          "Identifier": {
+            "PURL": "pkg:pypi/celery@5.5.3",
+            "UID": "2cc765d359c21eab"
+          },
+          "Version": "5.5.3",
+          "Locations": [
+            {
+              "StartLine": 8,
+              "EndLine": 8
+            }
+          ]
+        },
+        {
+          "Name": "click",
+          "Identifier": {
+            "PURL": "pkg:pypi/click@8.2.1",
+            "UID": "5563e72db0e5e8b6"
+          },
+          "Version": "8.2.1",
+          "Locations": [
+            {
+              "StartLine": 9,
+              "EndLine": 9
+            }
+          ]
+        },
+        {
+          "Name": "click-didyoumean",
+          "Identifier": {
+            "PURL": "pkg:pypi/click-didyoumean@0.3.1",
+            "UID": "1c5bed9cf70d36d"
+          },
+          "Version": "0.3.1",
+          "Locations": [
+            {
+              "StartLine": 10,
+              "EndLine": 10
+            }
+          ]
+        },
+        {
+          "Name": "click-plugins",
+          "Identifier": {
+            "PURL": "pkg:pypi/click-plugins@1.1.1.2",
+            "UID": "7451d7103ca9fe7a"
+          },
+          "Version": "1.1.1.2",
+          "Locations": [
+            {
+              "StartLine": 11,
+              "EndLine": 11
+            }
+          ]
+        },
+        {
+          "Name": "click-repl",
+          "Identifier": {
+            "PURL": "pkg:pypi/click-repl@0.3.0",
+            "UID": "2488437c6c3933ee"
+          },
+          "Version": "0.3.0",
+          "Locations": [
+            {
+              "StartLine": 12,
+              "EndLine": 12
+            }
+          ]
+        },
+        {
+          "Name": "dnspython",
+          "Identifier": {
+            "PURL": "pkg:pypi/dnspython@2.7.0",
+            "UID": "4056d2c883e38276"
+          },
+          "Version": "2.7.0",
+          "Locations": [
+            {
+              "StartLine": 49,
+              "EndLine": 49
+            }
+          ]
+        },
+        {
+          "Name": "email-validator",
+          "Identifier": {
+            "PURL": "pkg:pypi/email-validator@2.2.0",
+            "UID": "e89430dced9b3d0"
+          },
+          "Version": "2.2.0",
+          "Locations": [
+            {
+              "StartLine": 50,
+              "EndLine": 50
+            }
+          ]
+        },
+        {
+          "Name": "exceptiongroup",
+          "Identifier": {
+            "PURL": "pkg:pypi/exceptiongroup@1.3.0",
+            "UID": "95d5c7515efbfa3e"
+          },
+          "Version": "1.3.0",
+          "Locations": [
+            {
+              "StartLine": 13,
+              "EndLine": 13
+            }
+          ]
+        },
+        {
+          "Name": "fastapi",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi@0.116.1",
+            "UID": "26647f971c501f9a"
+          },
+          "Version": "0.116.1",
+          "Locations": [
+            {
+              "StartLine": 14,
+              "EndLine": 14
+            }
+          ]
+        },
+        {
+          "Name": "fastapi",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi@0.116.1",
+            "UID": "9f5593a2bb58aa2a"
+          },
+          "Version": "0.116.1",
+          "Locations": [
+            {
+              "StartLine": 51,
+              "EndLine": 51
+            }
+          ]
+        },
+        {
+          "Name": "fastapi-users",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi-users@14.0.1",
+            "UID": "c6a2f0367d3b82b5"
+          },
+          "Version": "14.0.1",
+          "Locations": [
+            {
+              "StartLine": 52,
+              "EndLine": 52
+            }
+          ]
+        },
+        {
+          "Name": "fastapi-users-db-sqlalchemy",
+          "Identifier": {
+            "PURL": "pkg:pypi/fastapi-users-db-sqlalchemy@7.0",
+            "UID": "ed5893caa3de2851"
+          },
+          "Version": "7.0",
+          "Locations": [
+            {
+              "StartLine": 53,
+              "EndLine": 53
+            }
+          ]
+        },
+        {
+          "Name": "greenlet",
+          "Identifier": {
+            "PURL": "pkg:pypi/greenlet@3.2.3",
+            "UID": "42f8b659b6064e17"
+          },
+          "Version": "3.2.3",
+          "Locations": [
+            {
+              "StartLine": 15,
+              "EndLine": 15
+            }
+          ]
+        },
+        {
+          "Name": "h11",
+          "Identifier": {
+            "PURL": "pkg:pypi/h11@0.16.0",
+            "UID": "3cf10a1ccb27af22"
+          },
+          "Version": "0.16.0",
+          "Locations": [
+            {
+              "StartLine": 16,
+              "EndLine": 16
+            }
+          ]
+        },
+        {
+          "Name": "httptools",
+          "Identifier": {
+            "PURL": "pkg:pypi/httptools@0.6.4",
+            "UID": "5e115431b49bbd6c"
+          },
+          "Version": "0.6.4",
+          "Locations": [
+            {
+              "StartLine": 41,
+              "EndLine": 41
+            }
+          ]
+        },
+        {
+          "Name": "idna",
+          "Identifier": {
+            "PURL": "pkg:pypi/idna@3.10",
+            "UID": "c8ab95c3ecc3ede6"
+          },
+          "Version": "3.10",
+          "Locations": [
+            {
+              "StartLine": 17,
+              "EndLine": 17
+            }
+          ]
+        },
+        {
+          "Name": "kombu",
+          "Identifier": {
+            "PURL": "pkg:pypi/kombu@5.5.4",
+            "UID": "99beca13b53f527"
+          },
+          "Version": "5.5.4",
+          "Locations": [
+            {
+              "StartLine": 18,
+              "EndLine": 18
+            }
+          ]
+        },
+        {
+          "Name": "mako",
+          "Identifier": {
+            "PURL": "pkg:pypi/mako@1.3.10",
+            "UID": "cf2449c4b6b4e616"
+          },
+          "Version": "1.3.10",
+          "Locations": [
+            {
+              "StartLine": 19,
+              "EndLine": 19
+            }
+          ]
+        },
+        {
+          "Name": "markupsafe",
+          "Identifier": {
+            "PURL": "pkg:pypi/markupsafe@3.0.2",
+            "UID": "26c2a5634b6f8092"
+          },
+          "Version": "3.0.2",
+          "Locations": [
+            {
+              "StartLine": 20,
+              "EndLine": 20
+            }
+          ]
+        },
+        {
+          "Name": "packaging",
+          "Identifier": {
+            "PURL": "pkg:pypi/packaging@25.0",
+            "UID": "201f78843d1f64e4"
+          },
+          "Version": "25.0",
+          "Locations": [
+            {
+              "StartLine": 21,
+              "EndLine": 21
+            }
+          ]
+        },
+        {
+          "Name": "prompt-toolkit",
+          "Identifier": {
+            "PURL": "pkg:pypi/prompt-toolkit@3.0.51",
+            "UID": "d2bcb4eccbbc71f9"
+          },
+          "Version": "3.0.51",
+          "Locations": [
+            {
+              "StartLine": 22,
+              "EndLine": 22
+            }
+          ]
+        },
+        {
+          "Name": "psycopg2-binary",
+          "Identifier": {
+            "PURL": "pkg:pypi/psycopg2-binary@2.9.10",
+            "UID": "a0b54f617cf22a87"
+          },
+          "Version": "2.9.10",
+          "Locations": [
+            {
+              "StartLine": 23,
+              "EndLine": 23
+            }
+          ]
+        },
+        {
+          "Name": "pydantic",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic@2.11.7",
+            "UID": "bc4348dc7613fc16"
+          },
+          "Version": "2.11.7",
+          "Locations": [
+            {
+              "StartLine": 24,
+              "EndLine": 24
+            }
+          ]
+        },
+        {
+          "Name": "pydantic-core",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic-core@2.33.2",
+            "UID": "169cd3dce5ea92a0"
+          },
+          "Version": "2.33.2",
+          "Locations": [
+            {
+              "StartLine": 25,
+              "EndLine": 25
+            }
+          ]
+        },
+        {
+          "Name": "pydantic-settings",
+          "Identifier": {
+            "PURL": "pkg:pypi/pydantic-settings@2.10.1",
+            "UID": "523964c11b722301"
+          },
+          "Version": "2.10.1",
+          "Locations": [
+            {
+              "StartLine": 26,
+              "EndLine": 26
+            }
+          ]
+        },
+        {
+          "Name": "python-dateutil",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dateutil@2.9.0.post0",
+            "UID": "82001667828d43d6"
+          },
+          "Version": "2.9.0.post0",
+          "Locations": [
+            {
+              "StartLine": 27,
+              "EndLine": 27
+            }
+          ]
+        },
+        {
+          "Name": "python-dotenv",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dotenv@1.1.1",
+            "UID": "edfd1a5c2a20e889"
+          },
+          "Version": "1.1.1",
+          "Locations": [
+            {
+              "StartLine": 28,
+              "EndLine": 28
+            }
+          ]
+        },
+        {
+          "Name": "python-dotenv",
+          "Identifier": {
+            "PURL": "pkg:pypi/python-dotenv@1.1.1",
+            "UID": "f94f2f35fad8a537"
+          },
+          "Version": "1.1.1",
+          "Locations": [
+            {
+              "StartLine": 42,
+              "EndLine": 42
+            }
+          ]
+        },
+        {
+          "Name": "redis",
+          "Identifier": {
+            "PURL": "pkg:pypi/redis@6.2.0",
+            "UID": "c229e4c7e6d64bd3"
+          },
+          "Version": "6.2.0",
+          "Locations": [
+            {
+              "StartLine": 29,
+              "EndLine": 29
+            }
+          ]
+        },
+        {
+          "Name": "six",
+          "Identifier": {
+            "PURL": "pkg:pypi/six@1.17.0",
+            "UID": "2cc7117da5dd8599"
+          },
+          "Version": "1.17.0",
+          "Locations": [
+            {
+              "StartLine": 30,
+              "EndLine": 30
+            }
+          ]
+        },
+        {
+          "Name": "sniffio",
+          "Identifier": {
+            "PURL": "pkg:pypi/sniffio@1.3.1",
+            "UID": "52fa92684e26ae73"
+          },
+          "Version": "1.3.1",
+          "Locations": [
+            {
+              "StartLine": 31,
+              "EndLine": 31
+            }
+          ]
+        },
+        {
+          "Name": "sqlalchemy",
+          "Identifier": {
+            "PURL": "pkg:pypi/sqlalchemy@2.0.42",
+            "UID": "f29c87ce982ed7e8"
+          },
+          "Version": "2.0.42",
+          "Locations": [
+            {
+              "StartLine": 32,
+              "EndLine": 32
+            }
+          ]
+        },
+        {
+          "Name": "starlette",
+          "Identifier": {
+            "PURL": "pkg:pypi/starlette@0.47.2",
+            "UID": "4c371cd4ea43a26f"
+          },
+          "Version": "0.47.2",
+          "Locations": [
+            {
+              "StartLine": 33,
+              "EndLine": 33
+            }
+          ]
+        },
+        {
+          "Name": "tomli",
+          "Identifier": {
+            "PURL": "pkg:pypi/tomli@2.2.1",
+            "UID": "af02ec05bab98a34"
+          },
+          "Version": "2.2.1",
+          "Locations": [
+            {
+              "StartLine": 34,
+              "EndLine": 34
+            }
+          ]
+        },
+        {
+          "Name": "typing-extensions",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-extensions@4.14.1",
+            "UID": "a420a59630e7da41"
+          },
+          "Version": "4.14.1",
+          "Locations": [
+            {
+              "StartLine": 35,
+              "EndLine": 35
+            }
+          ]
+        },
+        {
+          "Name": "typing-inspection",
+          "Identifier": {
+            "PURL": "pkg:pypi/typing-inspection@0.4.1",
+            "UID": "93d16ef1a425ebd9"
+          },
+          "Version": "0.4.1",
+          "Locations": [
+            {
+              "StartLine": 36,
+              "EndLine": 36
+            }
+          ]
+        },
+        {
+          "Name": "tzdata",
+          "Identifier": {
+            "PURL": "pkg:pypi/tzdata@2025.2",
+            "UID": "3e5eb97a6e1b3202"
+          },
+          "Version": "2025.2",
+          "Locations": [
+            {
+              "StartLine": 37,
+              "EndLine": 37
+            }
+          ]
+        },
+        {
+          "Name": "uvicorn",
+          "Identifier": {
+            "PURL": "pkg:pypi/uvicorn@0.35.0",
+            "UID": "e1dbf867e792868b"
+          },
+          "Version": "0.35.0",
+          "Locations": [
+            {
+              "StartLine": 38,
+              "EndLine": 38
+            }
+          ]
+        },
+        {
+          "Name": "uvloop",
+          "Identifier": {
+            "PURL": "pkg:pypi/uvloop@0.21.0",
+            "UID": "5bd2d03de4cad407"
+          },
+          "Version": "0.21.0",
+          "Locations": [
+            {
+              "StartLine": 43,
+              "EndLine": 43
+            }
+          ]
+        },
+        {
+          "Name": "vine",
+          "Identifier": {
+            "PURL": "pkg:pypi/vine@5.1.0",
+            "UID": "3b8148e70d960550"
+          },
+          "Version": "5.1.0",
+          "Locations": [
+            {
+              "StartLine": 39,
+              "EndLine": 39
+            }
+          ]
+        },
+        {
+          "Name": "watchfiles",
+          "Identifier": {
+            "PURL": "pkg:pypi/watchfiles@1.1.0",
+            "UID": "2df777502f8a804c"
+          },
+          "Version": "1.1.0",
+          "Locations": [
+            {
+              "StartLine": 44,
+              "EndLine": 44
+            }
+          ]
+        },
+        {
+          "Name": "wcwidth",
+          "Identifier": {
+            "PURL": "pkg:pypi/wcwidth@0.2.13",
+            "UID": "4341e4f12b81b7e5"
+          },
+          "Version": "0.2.13",
+          "Locations": [
+            {
+              "StartLine": 40,
+              "EndLine": 40
+            }
+          ]
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2025-62727",
+          "PkgName": "starlette",
+          "PkgIdentifier": {
+            "PURL": "pkg:pypi/starlette@0.47.2",
+            "UID": "4c371cd4ea43a26f"
+          },
+          "InstalledVersion": "0.47.2",
+          "FixedVersion": "0.49.1",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-62727",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory pip",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip"
+          },
+          "Title": "starlette: Starlette DoS via Range header merging",
+          "Description": "Starlette is a lightweight ASGI framework/toolkit. Starting in version 0.39.0 and prior to version 0.49.1 , an unauthenticated attacker can send a crafted HTTP Range header that triggers quadratic-time processing in Starlette's FileResponse Range parsing/merging logic. This enables CPU exhaustion per request, causing denial‑of‑service for endpoints serving files (e.g., StaticFiles or any use of FileResponse). This vulnerability is fixed in 0.49.1.",
+          "Severity": "HIGH",
+          "CweIDs": [
+            "CWE-407"
+          ],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2025-62727",
+            "https://github.com/Kludex/starlette",
+            "https://github.com/Kludex/starlette/commit/4ea6e22b489ec388d6004cfbca52dd5b147127c5",
+            "https://github.com/Kludex/starlette/commit/69ed26a85956ef4bd0161807eb27abf49be7cd3c",
+            "https://github.com/Kludex/starlette/releases/tag/0.49.1",
+            "https://github.com/Kludex/starlette/security/advisories/GHSA-7f5h-v6xp-fcq8",
+            "https://nvd.nist.gov/vuln/detail/CVE-2025-62727",
+            "https://www.cve.org/CVERecord?id=CVE-2025-62727"
+          ],
+          "PublishedDate": "2025-10-28T21:15:40.447Z",
+          "LastModifiedDate": "2025-11-04T18:16:45.48Z"
+        }
+      ]
+    }
+  ]
+}

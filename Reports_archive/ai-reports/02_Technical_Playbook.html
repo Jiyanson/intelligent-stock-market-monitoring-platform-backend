@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Technical Remediation Playbook — Build #LOCAL</title>
+<title>Technical Remediation Playbook — Build #49</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
  body{font:14px system-ui;margin:24px;color:#1f2328}
@@ -19,22 +19,22 @@
 </style>
 </head>
 <body>
-<h1>Technical Remediation Playbook <small>Build #LOCAL</small></h1>
+<h1>Technical Remediation Playbook <small>Build #49</small></h1>
 
 <div class="block">
   <strong>📊 Vulnerability Summary</strong>
   <ul>
-    <li>Total Vulnerabilities: 4</li>
-    <li>Container/OS Issues: 1</li>
+    <li>Total Vulnerabilities: 1471</li>
+    <li>Container/OS Issues: 1465</li>
     <li>Dependency Issues: 0</li>
-    <li>Code Issues: 1</li>
+    <li>Code Issues: 0</li>
     <li>Risk Level: <span class="sev critical">CRITICAL</span></li>
   </ul>
 </div>
 
 <h2>🐳 Container Security Fixes</h2>
 <div class="block">
-  <p><strong>Issue:</strong> 1 vulnerabilities in container base image and OS packages</p>
+  <p><strong>Issue:</strong> 1465 vulnerabilities in container base image and OS packages</p>
 
   <p><strong>Action:</strong></p>
   <pre>
@@ -54,7 +54,7 @@ trivy image --severity CRITICAL,HIGH app:latest
 
   <p><strong>Priority Packages to Update:</strong></p>
   <ul>
-    <li><code>openssl</code></li>
+    <li><code>apt</code></li><li><code>bash</code></li><li><code>bash-completion</code></li><li><code>binutils</code></li><li><code>binutils-common</code></li><li><code>binutils-x86-64-linux-gnu</code></li><li><code>bsdutils</code></li><li><code>coreutils</code></li><li><code>curl</code></li><li><code>krb5-locales</code></li>
   </ul>
 </div>
 
@@ -82,7 +82,7 @@ dependency-check --project "App" --scan .
 
 <h2>💻 Code Security Fixes</h2>
 <div class="block">
-  <p><strong>Issue:</strong> 1 code-level vulnerabilities found by SAST</p>
+  <p><strong>Issue:</strong> 0 code-level vulnerabilities found by SAST</p>
 
   <p><strong>Common Fixes:</strong></p>
   <ul>

@@ -1,0 +1,2249 @@
+{
+  "reportSchema" : "1.1",
+  "scanInfo" : {
+    "engineVersion" : "12.1.8",
+    "dataSource" : [ {
+      "name" : "NVD API Last Checked",
+      "timestamp" : "2025-11-12T22:28:51Z"
+    }, {
+      "name" : "NVD API Last Modified",
+      "timestamp" : "2025-11-12T22:15:50Z"
+    } ]
+  },
+  "projectInfo" : {
+    "name" : "stock-market-platform",
+    "reportDate" : "2025-11-13T01:39:05.947219540Z",
+    "credits" : {
+      "NVD" : "This product uses the NVD API but is not endorsed or certified by the NVD. This report contains data retrieved from the National Vulnerability Database: https://nvd.nist.gov",
+      "CISA" : "This report may contain data retrieved from the CISA Known Exploited Vulnerability Catalog: https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "NPM" : "This report may contain data retrieved from the Github Advisory Database (via NPM Audit API): https://github.com/advisories/",
+      "RETIREJS" : "This report may contain data retrieved from the RetireJS community: https://retirejs.github.io/retire.js/",
+      "OSSINDEX" : "This report may contain data retrieved from the Sonatype OSS Index: https://ossindex.sonatype.org"
+    }
+  },
+  "dependencies" : [ {
+    "isVirtual" : true,
+    "fileName" : "-i https://pypi.org/simple",
+    "filePath" : "/src/requirements.txt:-i https://pypi.org/simple/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "-i https://pypi.org/simple"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "-i https://pypi.org/simple"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/-i%20https%3A%2F%2Fpypi.org%2Fsimple",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "alembic:1.16.4",
+    "filePath" : "/src/requirements.txt:alembic/1.16.4",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "alembic"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "alembic"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "1.16.4"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/alembic@1.16.4",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "amqp==5.3.1; python_version >= '3.6'",
+    "filePath" : "/src/requirements.txt:amqp==5.3.1; python_version >= '3.6'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "amqp==5.3.1; python_version >= '3.6'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "amqp==5.3.1; python_version >= '3.6'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/amqp%3D%3D5.3.1%3B%20python-version%20%3E%3D%20%273.6%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "annotated-types==0.7.0; python_version >= '3.8'",
+    "filePath" : "/src/requirements.txt:annotated-types==0.7.0; python_version >= '3.8'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "annotated-types==0.7.0; python_version >= '3.8'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "annotated-types==0.7.0; python_version >= '3.8'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/annotated-types%3D%3D0.7.0%3B%20python-version%20%3E%3D%20%273.8%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "anyio:4.9.0",
+    "filePath" : "/src/requirements.txt:anyio/4.9.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "anyio"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "anyio"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "4.9.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/anyio@4.9.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "anyio==4.9.0; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:anyio==4.9.0; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "anyio==4.9.0; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "anyio==4.9.0; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/anyio%3D%3D4.9.0%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : false,
+    "fileName" : "app:1.1.0",
+    "filePath" : "/src/app/__init__.py",
+    "md5" : "d41d8cd98f00b204e9800998ecf8427e",
+    "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "relatedDependencies" : [ {
+      "isVirtual" : false,
+      "fileName" : "__init__.py",
+      "filePath" : "/src/app/api/__init__.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "__init__.py",
+      "filePath" : "/src/app/api/routes/__init__.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "__init__.py",
+      "filePath" : "/src/app/core/__init__.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "__init__.py",
+      "filePath" : "/src/app/db/models/__init__.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "__init__.py",
+      "filePath" : "/src/app/schemas/__init__.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "__init__.py",
+      "filePath" : "/src/app/services/__init__.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "deps.py",
+      "filePath" : "/src/app/api/deps.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    }, {
+      "isVirtual" : false,
+      "fileName" : "tasks.py",
+      "filePath" : "/src/app/services/tasks.py",
+      "sha256" : "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha1" : "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+      "md5" : "d41d8cd98f00b204e9800998ecf8427e"
+    } ],
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "MEDIUM",
+        "source" : "__init__.py",
+        "name" : "PackageName",
+        "value" : "app"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "__init__.py",
+        "name" : "PackageName",
+        "value" : "app"
+      }, {
+        "type" : "product",
+        "confidence" : "LOW",
+        "source" : "main.py",
+        "name" : "SourceTitle",
+        "value" : "Stock Market Monitoring Platform"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "MEDIUM",
+        "source" : "main.py",
+        "name" : "SourceVersion",
+        "value" : "1.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/app@1.1.0",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:app_project:app:1.1.0:*:*:*:*:*:*:*",
+      "confidence" : "MEDIUM",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Aapp_project%3Aapp%3A1.1.0%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "argon2-cffi-bindings:25.1.0",
+    "filePath" : "/src/requirements.txt:argon2-cffi-bindings/25.1.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "argon2-cffi-bindings"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "argon2-cffi-bindings"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "25.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/argon2-cffi-bindings@25.1.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "argon2-cffi:23.1.0",
+    "filePath" : "/src/requirements.txt:argon2-cffi/23.1.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "argon2-cffi"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "argon2-cffi"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "23.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/argon2-cffi@23.1.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "async-timeout==5.0.1; python_full_version < '3.11.3'",
+    "filePath" : "/src/requirements.txt:async-timeout==5.0.1; python_full_version < '3.11.3'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "async-timeout==5.0.1; python_full_version < '3.11.3'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "async-timeout==5.0.1; python_full_version < '3.11.3'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/async-timeout%3D%3D5.0.1%3B%20python-full-version%20%3C%20%273.11.3%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "asyncpg:0.29.0",
+    "filePath" : "/src/requirements.txt:asyncpg/0.29.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "asyncpg"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "asyncpg"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "0.29.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/asyncpg@0.29.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "bcrypt:4.3.0",
+    "filePath" : "/src/requirements.txt:bcrypt/4.3.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "bcrypt"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "bcrypt"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "4.3.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/bcrypt@4.3.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "billiard==4.2.1; python_version >= '3.7'",
+    "filePath" : "/src/requirements.txt:billiard==4.2.1; python_version >= '3.7'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "billiard==4.2.1; python_version >= '3.7'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "billiard==4.2.1; python_version >= '3.7'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/billiard%3D%3D4.2.1%3B%20python-version%20%3E%3D%20%273.7%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "black:25.1.0",
+    "filePath" : "/src/Pipfile.lock:black/25.1.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "black"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "black"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "25.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/black@25.1.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "celery:5.5.3",
+    "filePath" : "/src/requirements.txt:celery/5.5.3",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "celery"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "celery"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "5.5.3"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/celery@5.5.3",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "click-didyoumean==0.3.1; python_full_version >= '3.6.2'",
+    "filePath" : "/src/requirements.txt:click-didyoumean==0.3.1; python_full_version >= '3.6.2'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "click-didyoumean==0.3.1; python_full_version >= '3.6.2'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "click-didyoumean==0.3.1; python_full_version >= '3.6.2'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/click-didyoumean%3D%3D0.3.1%3B%20python-full-version%20%3E%3D%20%273.6.2%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "click-plugins:1.1.1.2",
+    "filePath" : "/src/requirements.txt:click-plugins/1.1.1.2",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "click-plugins"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "click-plugins"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "1.1.1.2"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/click-plugins@1.1.1.2",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:click_project:click:1.1.1.2:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Aclick_project%3Aclick%3A1.1.1.2%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "click-repl==0.3.0; python_version >= '3.6'",
+    "filePath" : "/src/requirements.txt:click-repl==0.3.0; python_version >= '3.6'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "click-repl==0.3.0; python_version >= '3.6'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "click-repl==0.3.0; python_version >= '3.6'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/click-repl%3D%3D0.3.0%3B%20python-version%20%3E%3D%20%273.6%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "click:8.2.1",
+    "filePath" : "/src/Pipfile.lock:click/8.2.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "click"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "click"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "8.2.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/click@8.2.1",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:click_project:click:8.2.1:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Aclick_project%3Aclick%3A8.2.1%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "click==8.2.1; python_version >= '3.10'",
+    "filePath" : "/src/requirements.txt:click==8.2.1; python_version >= '3.10'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "click==8.2.1; python_version >= '3.10'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "click==8.2.1; python_version >= '3.10'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/click%3D%3D8.2.1%3B%20python-version%20%3E%3D%20%273.10%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "dnspython:2.7.0",
+    "filePath" : "/src/requirements.txt:dnspython/2.7.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "dnspython"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "dnspython"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.7.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/dnspython@2.7.0",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:dnspython:dnspython:2.7.0:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Adnspython%3Adnspython%3A2.7.0%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "email-validator:2.2.0",
+    "filePath" : "/src/requirements.txt:email-validator/2.2.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "email-validator"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "email-validator"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.2.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/email-validator@2.2.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "exceptiongroup:1.3.0",
+    "filePath" : "/src/Pipfile.lock:exceptiongroup/1.3.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "exceptiongroup"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "exceptiongroup"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "1.3.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/exceptiongroup@1.3.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "exceptiongroup==1.3.0; python_version < '3.11'",
+    "filePath" : "/src/requirements.txt:exceptiongroup==1.3.0; python_version < '3.11'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "exceptiongroup==1.3.0; python_version < '3.11'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "exceptiongroup==1.3.0; python_version < '3.11'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/exceptiongroup%3D%3D1.3.0%3B%20python-version%20%3C%20%273.11%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "fastapi-users-db-sqlalchemy:7.0",
+    "filePath" : "/src/requirements.txt:fastapi-users-db-sqlalchemy/7.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "fastapi-users-db-sqlalchemy"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "fastapi-users-db-sqlalchemy"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "7.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/fastapi-users-db-sqlalchemy@7.0",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:sqlalchemy:sqlalchemy:7.0:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Asqlalchemy%3Asqlalchemy%3A7.0%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "fastapi-users:14.0.1",
+    "filePath" : "/src/requirements.txt:fastapi-users/14.0.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "fastapi-users"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "fastapi-users"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "14.0.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/fastapi-users@14.0.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "fastapi:0.116.1",
+    "filePath" : "/src/requirements.txt:fastapi/0.116.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "fastapi"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "fastapi"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "0.116.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/fastapi@0.116.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "greenlet==3.2.3; python_version < '3.14' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))",
+    "filePath" : "/src/requirements.txt:greenlet==3.2.3; python_version < '3.14' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "greenlet==3.2.3; python_version < '3.14' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "greenlet==3.2.3; python_version < '3.14' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/greenlet%3D%3D3.2.3%3B%20python-version%20%3C%20%273.14%27%20and%20platform-machine%20%3D%3D%20%27aarch64%27%20or%20%28platform-machine%20%3D%3D%20%27ppc64le%27%20or%20%28platform-machine%20%3D%3D%20%27x86-64%27%20or%20%28platform-machine%20%3D%3D%20%27amd64%27%20or%20%28platform-machine%20%3D%3D%20%27amd64%27%20or%20%28platform-machine%20%3D%3D%20%27win32%27%20or%20platform-machine%20%3D%3D%20%27win32%27%29%29%29%29%29",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "h11==0.16.0; python_version >= '3.8'",
+    "filePath" : "/src/requirements.txt:h11==0.16.0; python_version >= '3.8'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "h11==0.16.0; python_version >= '3.8'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "h11==0.16.0; python_version >= '3.8'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/h11%3D%3D0.16.0%3B%20python-version%20%3E%3D%20%273.8%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "httptools:0.6.4",
+    "filePath" : "/src/requirements.txt:httptools/0.6.4",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "httptools"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "httptools"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "0.6.4"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/httptools@0.6.4",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "idna==3.10; python_version >= '3.6'",
+    "filePath" : "/src/requirements.txt:idna==3.10; python_version >= '3.6'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "idna==3.10; python_version >= '3.6'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "idna==3.10; python_version >= '3.6'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/idna%3D%3D3.10%3B%20python-version%20%3E%3D%20%273.6%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "iniconfig:2.1.0",
+    "filePath" : "/src/Pipfile.lock:iniconfig/2.1.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "iniconfig"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "iniconfig"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "2.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/iniconfig@2.1.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "isort:6.0.1",
+    "filePath" : "/src/Pipfile.lock:isort/6.0.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "isort"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "isort"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "6.0.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/isort@6.0.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "kombu==5.5.4; python_version >= '3.8'",
+    "filePath" : "/src/requirements.txt:kombu==5.5.4; python_version >= '3.8'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "kombu==5.5.4; python_version >= '3.8'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "kombu==5.5.4; python_version >= '3.8'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/kombu%3D%3D5.5.4%3B%20python-version%20%3E%3D%20%273.8%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "mako==1.3.10; python_version >= '3.8'",
+    "filePath" : "/src/requirements.txt:mako==1.3.10; python_version >= '3.8'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "mako==1.3.10; python_version >= '3.8'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "mako==1.3.10; python_version >= '3.8'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/mako%3D%3D1.3.10%3B%20python-version%20%3E%3D%20%273.8%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "markupsafe==3.0.2; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:markupsafe==3.0.2; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "markupsafe==3.0.2; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "markupsafe==3.0.2; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/markupsafe%3D%3D3.0.2%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "mypy-extensions:1.1.0",
+    "filePath" : "/src/Pipfile.lock:mypy-extensions/1.1.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "mypy-extensions"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "mypy-extensions"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "1.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/mypy-extensions@1.1.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "packaging:25.0",
+    "filePath" : "/src/Pipfile.lock:packaging/25.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "packaging"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "packaging"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "25.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/packaging@25.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "packaging==25.0; python_version >= '3.8'",
+    "filePath" : "/src/requirements.txt:packaging==25.0; python_version >= '3.8'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "packaging==25.0; python_version >= '3.8'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "packaging==25.0; python_version >= '3.8'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/packaging%3D%3D25.0%3B%20python-version%20%3E%3D%20%273.8%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pathspec:0.12.1",
+    "filePath" : "/src/Pipfile.lock:pathspec/0.12.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "pathspec"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "pathspec"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "0.12.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pathspec@0.12.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "platformdirs:4.3.8",
+    "filePath" : "/src/Pipfile.lock:platformdirs/4.3.8",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "platformdirs"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "platformdirs"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "4.3.8"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/platformdirs@4.3.8",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pluggy:1.6.0",
+    "filePath" : "/src/Pipfile.lock:pluggy/1.6.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "pluggy"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "pluggy"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "1.6.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pluggy@1.6.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "prompt-toolkit==3.0.51; python_version >= '3.8'",
+    "filePath" : "/src/requirements.txt:prompt-toolkit==3.0.51; python_version >= '3.8'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "prompt-toolkit==3.0.51; python_version >= '3.8'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "prompt-toolkit==3.0.51; python_version >= '3.8'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/prompt-toolkit%3D%3D3.0.51%3B%20python-version%20%3E%3D%20%273.8%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "psycopg2-binary:2.9.10",
+    "filePath" : "/src/requirements.txt:psycopg2-binary/2.9.10",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "psycopg2-binary"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "psycopg2-binary"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.9.10"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/psycopg2-binary@2.9.10",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:binary_project:binary:2.9.10:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Abinary_project%3Abinary%3A2.9.10%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pydantic-core==2.33.2; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:pydantic-core==2.33.2; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "pydantic-core==2.33.2; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "pydantic-core==2.33.2; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pydantic-core%3D%3D2.33.2%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pydantic-settings:2.10.1",
+    "filePath" : "/src/requirements.txt:pydantic-settings/2.10.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "pydantic-settings"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "pydantic-settings"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.10.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pydantic-settings@2.10.1",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:pydantic_project:pydantic:2.10.1:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Apydantic_project%3Apydantic%3A2.10.1%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pydantic:2.11.7",
+    "filePath" : "/src/requirements.txt:pydantic/2.11.7",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "pydantic"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "pydantic"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.11.7"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pydantic@2.11.7",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:pydantic_project:pydantic:2.11.7:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Apydantic_project%3Apydantic%3A2.11.7%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pygments:2.19.2",
+    "filePath" : "/src/Pipfile.lock:pygments/2.19.2",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "pygments"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "pygments"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "2.19.2"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pygments@2.19.2",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:pygments:pygments:2.19.2:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Apygments%3Apygments%3A2.19.2%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "pytest:8.4.1",
+    "filePath" : "/src/Pipfile.lock:pytest/8.4.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "pytest"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "pytest"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "8.4.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/pytest@8.4.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "python-dateutil==2.9.0.post0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+    "filePath" : "/src/requirements.txt:python-dateutil==2.9.0.post0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "python-dateutil==2.9.0.post0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "python-dateutil==2.9.0.post0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/python-dateutil%3D%3D2.9.0.post0%3B%20python-version%20%3E%3D%20%272.7%27%20and%20python-version%20not%20in%20%273.0%2C%203.1%2C%203.2%2C%203.3%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "python-dotenv:1.1.1",
+    "filePath" : "/src/requirements.txt:python-dotenv/1.1.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "python-dotenv"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "python-dotenv"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "1.1.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/python-dotenv@1.1.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "redis:6.2.0",
+    "filePath" : "/src/requirements.txt:redis/6.2.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "redis"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "redis"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "6.2.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/redis@6.2.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "requests:2.31.0",
+    "filePath" : "/src/requirements.txt:requests/2.31.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "requests"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "requests"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.31.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/requests@2.31.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "six==1.17.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+    "filePath" : "/src/requirements.txt:six==1.17.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "six==1.17.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "six==1.17.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/six%3D%3D1.17.0%3B%20python-version%20%3E%3D%20%272.7%27%20and%20python-version%20not%20in%20%273.0%2C%203.1%2C%203.2%2C%203.3%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "sniffio==1.3.1; python_version >= '3.7'",
+    "filePath" : "/src/requirements.txt:sniffio==1.3.1; python_version >= '3.7'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "sniffio==1.3.1; python_version >= '3.7'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "sniffio==1.3.1; python_version >= '3.7'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/sniffio%3D%3D1.3.1%3B%20python-version%20%3E%3D%20%273.7%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "sqlalchemy:2.0.42",
+    "filePath" : "/src/requirements.txt:sqlalchemy/2.0.42",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "sqlalchemy"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "sqlalchemy"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "2.0.42"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/sqlalchemy@2.0.42",
+      "confidence" : "HIGHEST"
+    } ],
+    "vulnerabilityIds" : [ {
+      "id" : "cpe:2.3:a:sqlalchemy:sqlalchemy:2.0.42:*:*:*:*:*:*:*",
+      "confidence" : "HIGHEST",
+      "url" : "https://nvd.nist.gov/vuln/search#/nvd/home?sortOrder=3&sortDirection=2&cpeFilterMode=applicability&resultType=records&cpeName=cpe%3A2.3%3Aa%3Asqlalchemy%3Asqlalchemy%3A2.0.42%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A%3A%2A"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "starlette==0.47.2; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:starlette==0.47.2; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "starlette==0.47.2; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "starlette==0.47.2; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/starlette%3D%3D0.47.2%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "tomli:2.2.1",
+    "filePath" : "/src/Pipfile.lock:tomli/2.2.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "tomli"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "tomli"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "2.2.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/tomli@2.2.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "tomli==2.2.1; python_version < '3.11'",
+    "filePath" : "/src/requirements.txt:tomli==2.2.1; python_version < '3.11'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "tomli==2.2.1; python_version < '3.11'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "tomli==2.2.1; python_version < '3.11'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/tomli%3D%3D2.2.1%3B%20python-version%20%3C%20%273.11%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "typing-extensions:4.14.1",
+    "filePath" : "/src/Pipfile.lock:typing-extensions/4.14.1",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "vendor",
+        "value" : "typing-extensions"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "product",
+        "value" : "typing-extensions"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "Pipfile.lock",
+        "name" : "version",
+        "value" : "4.14.1"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/typing-extensions@4.14.1",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "typing-extensions==4.14.1; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:typing-extensions==4.14.1; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "typing-extensions==4.14.1; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "typing-extensions==4.14.1; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/typing-extensions%3D%3D4.14.1%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "typing-inspection==0.4.1; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:typing-inspection==0.4.1; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "typing-inspection==0.4.1; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "typing-inspection==0.4.1; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/typing-inspection%3D%3D0.4.1%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "tzdata==2025.2; python_version >= '3.9'",
+    "filePath" : "/src/requirements.txt:tzdata==2025.2; python_version >= '3.9'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "tzdata==2025.2; python_version >= '3.9'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "tzdata==2025.2; python_version >= '3.9'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/tzdata%3D%3D2025.2%3B%20python-version%20%3E%3D%20%273.9%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "uvicorn:0.35.0",
+    "filePath" : "/src/requirements.txt:uvicorn/0.35.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "uvicorn"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "uvicorn"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "0.35.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/uvicorn@0.35.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "uvloop:0.21.0",
+    "filePath" : "/src/requirements.txt:uvloop/0.21.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "uvloop"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "uvloop"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "0.21.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/uvloop@0.21.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "vine==5.1.0; python_version >= '3.6'",
+    "filePath" : "/src/requirements.txt:vine==5.1.0; python_version >= '3.6'/null",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "vine==5.1.0; python_version >= '3.6'"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "vine==5.1.0; python_version >= '3.6'"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "$enc.json($evidence.getValue().trim())"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/vine%3D%3D5.1.0%3B%20python-version%20%3E%3D%20%273.6%27",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "watchfiles:1.1.0",
+    "filePath" : "/src/requirements.txt:watchfiles/1.1.0",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "watchfiles"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "watchfiles"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "1.1.0"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/watchfiles@1.1.0",
+      "confidence" : "HIGHEST"
+    } ]
+  }, {
+    "isVirtual" : true,
+    "fileName" : "wcwidth:0.2.13",
+    "filePath" : "/src/requirements.txt:wcwidth/0.2.13",
+    "evidenceCollected" : {
+      "vendorEvidence" : [ {
+        "type" : "vendor",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "vendor",
+        "value" : "wcwidth"
+      } ],
+      "productEvidence" : [ {
+        "type" : "product",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "product",
+        "value" : "wcwidth"
+      } ],
+      "versionEvidence" : [ {
+        "type" : "version",
+        "confidence" : "HIGHEST",
+        "source" : "requirements.txt",
+        "name" : "version",
+        "value" : "0.2.13"
+      } ]
+    },
+    "packages" : [ {
+      "id" : "pkg:pypi/wcwidth@0.2.13",
+      "confidence" : "HIGHEST"
+    } ]
+  } ]
+}
