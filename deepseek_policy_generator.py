@@ -19,7 +19,7 @@ class DeepSeekPolicyGenerator:
 
     def __init__(self, hf_token: str):
         self.hf_token = hf_token
-        self.model_id = "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+        self.model_id = "deepseek-ai/DeepSeek-R1"
         self.model_name = "DeepSeek R1"
         self.base_url = f"https://router.huggingface.co/hf-inference/models/{self.model_id}"
 

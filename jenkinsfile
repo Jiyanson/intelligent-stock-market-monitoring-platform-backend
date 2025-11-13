@@ -17,7 +17,7 @@ pipeline {
 
         // HuggingFace for AI (DeepSeek R1)
         HF_TOKEN_CREDENTIALS_ID = 'huggingface-token'
-        HF_MODEL = 'deepseek-ai/DeepSeek-R1-Distill-Llama-8B'
+        HF_MODEL = 'deepseek-ai/DeepSeek-R1'
 
         // Grafana
         GRAFANA_URL = 'https://ayoubcpge9.grafana.net'
