@@ -664,8 +664,20 @@ except:
                             echo "======================================================================"
                             echo ""
                             echo "📊 Generated Artifacts:"
-                            ls -lh ai-policies/*.json 2>/dev/null | awk '{print "   • " \$9 " - " \$5}' || echo "   No policy files found"
-                            ls -lh ai-reports/*.html 2>/dev/null | awk '{print "   • " \$9 " - " \$5}' || echo "   No report files found"
+                            if ls ai-policies/*.json >/dev/null 2>&1; then
+                                ls -lh ai-policies/*.json | while read -r perms links owner group size month day time file; do
+                                    echo "   • \${file} - \${size}"
+                                done
+                            else
+                                echo "   No policy files found"
+                            fi
+                            if ls ai-reports/*.html >/dev/null 2>&1; then
+                                ls -lh ai-reports/*.html | while read -r perms links owner group size month day time file; do
+                                    echo "   • \${file} - \${size}"
+                                done
+                            else
+                                echo "   No report files found"
+                            fi
 
                             if [ -f ai-policies/model_comparison_report.json ]; then
                                 echo ""
