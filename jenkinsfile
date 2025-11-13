@@ -682,15 +682,27 @@ except:
                             if [ -f ai-policies/model_comparison_report.json ]; then
                                 echo ""
                                 echo "🏆 Model Comparison Results:"
-                                WINNER=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('model_name', 'N/A'))" 2>/dev/null || echo "N/A")
-                                WINNER_SCORE=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(f\"{data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('quality_score', 0):.1f}\")" 2>/dev/null || echo "0")
-                                echo "   Winner: \${WINNER} (Quality Score: \${WINNER_SCORE}/100)"
+                                python3 << 'PYEOF'
+import json
+try:
+    with open('ai-policies/model_comparison_report.json') as f:
+        data = json.load(f)
+    winner = data.get('winner', 'unknown')
+    results = data.get('individual_results', {})
+    winner_data = results.get(winner, {})
+    winner_name = winner_data.get('model_name', 'N/A')
+    winner_score = winner_data.get('quality_score', 0)
+    print(f"   Winner: {winner_name} - Quality Score: {winner_score:.1f}/100")
 
-                                if [ -f ai-policies/security-policies.json ]; then
-                                    POLICY_COUNT=\$(python3 -c "import json; data=json.load(open('ai-policies/security-policies.json')); print(len(data.get('policies', [])))" 2>/dev/null || echo "0")
-                                    RECOMMENDATION_COUNT=\$(python3 -c "import json; data=json.load(open('ai-policies/security-policies.json')); print(len(data.get('recommendations', [])))" 2>/dev/null || echo "0")
-                                    echo "   Policies: \${POLICY_COUNT}, Recommendations: \${RECOMMENDATION_COUNT}"
-                                fi
+    if 'security-policies.json' in open('ai-policies/security-policies.json').read():
+        with open('ai-policies/security-policies.json') as f:
+            policies = json.load(f)
+        policy_count = len(policies.get('policies', []))
+        rec_count = len(policies.get('recommendations', []))
+        print(f"   Policies: {policy_count}, Recommendations: {rec_count}")
+except Exception as e:
+    print(f"   Could not parse comparison results")
+PYEOF
                             fi
 
                             echo ""
