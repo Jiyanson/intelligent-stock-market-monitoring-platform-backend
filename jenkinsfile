@@ -15,9 +15,9 @@ pipeline {
         SONAR_HOST_URL = 'http://host.docker.internal:9000'  // Fixed for Docker-in-Docker
         SONAR_LOGIN_ID = 'sonarqube-token'
 
-        // OpenRouter for AI (DeepSeek R1)
+        // OpenRouter for AI (DeepSeek R1 vs LLaMA 3.3)
         OPENROUTER_API_KEY_CREDENTIALS_ID = 'openrouter-api-key'
-        AI_MODEL = 'deepseek/deepseek-r1'
+        AI_MODELS = 'deepseek/deepseek-r1,meta-llama/llama-3.3-70b-instruct'
 
         // Grafana
         GRAFANA_URL = 'https://ayoubcpge9.grafana.net'
@@ -645,14 +645,15 @@ except:
         stage('AI Security Policy Generation') {
             steps {
                 script {
-                    echo '🤖 Generating AI-powered security policies with DeepSeek R1 via OpenRouter...'
+                    echo '🤖 Generating AI-powered security policies with DUAL-MODEL COMPARISON...'
+                    echo '   Models: DeepSeek R1 vs LLaMA 3.3 70B (via OpenRouter)'
                     withCredentials([string(credentialsId: OPENROUTER_API_KEY_CREDENTIALS_ID, variable: 'OPENROUTER_API_KEY')]) {
                         sh """
-                            echo "🔬 Running DeepSeek R1 policy generation via OpenRouter..."
+                            echo "🔬 Running dual-model comparison via OpenRouter..."
 
                             pip3 install --quiet requests 2>/dev/null || true
 
-                            python3 deepseek_policy_generator.py || echo "⚠️  DeepSeek policy generation failed, continuing..."
+                            python3 dual_model_openrouter.py || echo "⚠️  Dual-model generation failed, continuing..."
 
                             echo "📄 Generating comprehensive AI reports..."
                             python3 generate_ai_reports.py || echo "Report generation completed"
@@ -666,13 +667,18 @@ except:
                             ls -lh ai-policies/*.json 2>/dev/null | awk '{print "   • " \$9 " - " \$5}' || echo "   No policy files found"
                             ls -lh ai-reports/*.html 2>/dev/null | awk '{print "   • " \$9 " - " \$5}' || echo "   No report files found"
 
-                            if [ -f ai-policies/security-policies.json ]; then
+                            if [ -f ai-policies/model_comparison_report.json ]; then
                                 echo ""
-                                echo "✅ DeepSeek R1 Policies Generated:"
-                                POLICY_COUNT=\$(python3 -c "import json; data=json.load(open('ai-policies/security-policies.json')); print(len(data.get('policies', [])))" 2>/dev/null || echo "0")
-                                RECOMMENDATION_COUNT=\$(python3 -c "import json; data=json.load(open('ai-policies/security-policies.json')); print(len(data.get('recommendations', [])))" 2>/dev/null || echo "0")
-                                echo "   Policies: \${POLICY_COUNT}"
-                                echo "   Recommendations: \${RECOMMENDATION_COUNT}"
+                                echo "🏆 Model Comparison Results:"
+                                WINNER=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('model_name', 'N/A'))" 2>/dev/null || echo "N/A")
+                                WINNER_SCORE=\$(python3 -c "import json; data=json.load(open('ai-policies/model_comparison_report.json')); print(f\"{data.get('individual_results', {}).get(data.get('winner', 'unknown'), {}).get('quality_score', 0):.1f}\")" 2>/dev/null || echo "0")
+                                echo "   Winner: \${WINNER} (Quality Score: \${WINNER_SCORE}/100)"
+
+                                if [ -f ai-policies/security-policies.json ]; then
+                                    POLICY_COUNT=\$(python3 -c "import json; data=json.load(open('ai-policies/security-policies.json')); print(len(data.get('policies', [])))" 2>/dev/null || echo "0")
+                                    RECOMMENDATION_COUNT=\$(python3 -c "import json; data=json.load(open('ai-policies/security-policies.json')); print(len(data.get('recommendations', [])))" 2>/dev/null || echo "0")
+                                    echo "   Policies: \${POLICY_COUNT}, Recommendations: \${RECOMMENDATION_COUNT}"
+                                fi
                             fi
 
                             echo ""
@@ -822,7 +828,7 @@ except:
                         echo "  ✓ Trivy (Container Scanning)"
                         echo "  ✓ SonarQube (Code Quality & SAST)"
                         echo "  ✓ OWASP ZAP (DAST)"
-                        echo "  ✓ DeepSeek R1 (AI Security Analysis)"
+                        echo "  ✓ DeepSeek R1 vs LLaMA 3.3 (AI Security Analysis)"
 
                         echo ""
                         echo "✅ Pipeline execution completed successfully"
