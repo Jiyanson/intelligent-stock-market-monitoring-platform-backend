@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 DeepSeek R1 Security Policy Generator
-Generates security policies using DeepSeek R1 model
+Generates security policies using DeepSeek R1 model via OpenRouter
 """
 
 import os
@@ -15,62 +15,78 @@ import requests
 
 
 class DeepSeekPolicyGenerator:
-    """Generates security policies using DeepSeek R1."""
+    """Generates security policies using DeepSeek R1 via OpenRouter."""
 
-    def __init__(self, hf_token: str):
-        self.hf_token = hf_token
-        self.model_id = "deepseek-ai/DeepSeek-R1"
+    def __init__(self, api_key: str):
+        self.api_key = api_key
+        self.model_id = "deepseek/deepseek-r1"
         self.model_name = "DeepSeek R1"
-        self.base_url = f"https://router.huggingface.co/hf-inference/models/{self.model_id}"
+        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
 
     def call_model(self, prompt: str, max_retries: int = 3) -> Optional[Dict[str, Any]]:
-        """Call DeepSeek model and return response with metadata."""
+        """Call DeepSeek model via OpenRouter and return response with metadata."""
         headers = {
-            "Authorization": f"Bearer {self.hf_token}",
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://github.com/devsecops-pipeline",
+            "X-Title": "DevSecOps Security Policy Generator"
         }
 
         payload = {
-            "inputs": prompt,
-            "parameters": {
-                "max_new_tokens": 2000,
-                "temperature": 0.7,
-                "top_p": 0.95,
-                "do_sample": True,
-                "return_full_text": False
-            }
+            "model": self.model_id,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            "max_tokens": 2000,
+            "temperature": 0.7,
+            "top_p": 0.95
         }
 
         start_time = time.time()
 
         for attempt in range(max_retries):
             try:
-                print(f"   Calling {self.model_name} (attempt {attempt + 1}/{max_retries})...")
+                print(f"   Calling {self.model_name} via OpenRouter (attempt {attempt + 1}/{max_retries})...")
 
-                response = requests.post(self.base_url, headers=headers, json=payload, timeout=120)
+                response = requests.post(self.base_url, headers=headers, json=payload, timeout=180)
 
                 if response.status_code == 200:
                     result = response.json()
                     response_time = time.time() - start_time
 
-                    if isinstance(result, list) and len(result) > 0:
-                        generated_text = result[0].get("generated_text", "")
-                    elif isinstance(result, dict):
-                        generated_text = result.get("generated_text", "")
-                    else:
-                        generated_text = str(result)
+                    # Extract content from OpenRouter response
+                    generated_text = ""
+                    if "choices" in result and len(result["choices"]) > 0:
+                        message = result["choices"][0].get("message", {})
+                        generated_text = message.get("content", "")
+
+                    if not generated_text:
+                        print(f"   ⚠️  Empty response from model")
+                        if attempt < max_retries - 1:
+                            time.sleep(5)
+                            continue
 
                     return {
                         "success": True,
                         "response": generated_text,
                         "response_time": response_time,
                         "timestamp": datetime.utcnow().isoformat(),
-                        "token_count": len(generated_text.split())
+                        "token_count": len(generated_text.split()),
+                        "usage": result.get("usage", {})
                     }
 
-                elif response.status_code == 503:
-                    wait_time = min(20 * (attempt + 1), 60)
-                    print(f"   Model loading... waiting {wait_time}s")
+                elif response.status_code == 429:
+                    wait_time = min(10 * (attempt + 1), 30)
+                    print(f"   Rate limited... waiting {wait_time}s")
+                    time.sleep(wait_time)
+                    continue
+
+                elif response.status_code in [502, 503]:
+                    wait_time = min(15 * (attempt + 1), 45)
+                    print(f"   Service unavailable... waiting {wait_time}s")
                     time.sleep(wait_time)
                     continue
 
@@ -280,15 +296,16 @@ def load_vulnerability_data(data_path: str = "processed/normalized_vulnerabiliti
 def main():
     """Main execution."""
     print("="*70)
-    print("DEEPSEEK R1 SECURITY POLICY GENERATOR")
+    print("DEEPSEEK R1 SECURITY POLICY GENERATOR (via OpenRouter)")
     print("="*70)
 
-    # Get HuggingFace token
-    hf_token = os.environ.get('HF_TOKEN', '')
+    # Get OpenRouter API key
+    api_key = os.environ.get('OPENROUTER_API_KEY', '')
 
-    if not hf_token or len(hf_token) < 10:
-        print("❌ Error: Valid HF_TOKEN required")
-        print("   Set environment variable: export HF_TOKEN='your_token'")
+    if not api_key or len(api_key) < 10:
+        print("❌ Error: Valid OPENROUTER_API_KEY required")
+        print("   Set environment variable: export OPENROUTER_API_KEY='your_key'")
+        print("   Get your key at: https://openrouter.ai/keys")
         return 1
 
     # Load vulnerability data
@@ -298,7 +315,7 @@ def main():
     print(f"   Risk Level: {vuln_data['risk_metrics']['risk_level']}")
 
     # Initialize generator
-    generator = DeepSeekPolicyGenerator(hf_token)
+    generator = DeepSeekPolicyGenerator(api_key)
 
     # Generate policies
     result = generator.generate_policies(vuln_data)
