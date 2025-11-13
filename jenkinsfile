@@ -15,9 +15,9 @@ pipeline {
         SONAR_HOST_URL = 'http://host.docker.internal:9000'  // Fixed for Docker-in-Docker
         SONAR_LOGIN_ID = 'sonarqube-token'
 
-        // HuggingFace for AI (DeepSeek R1)
-        HF_TOKEN_CREDENTIALS_ID = 'huggingface-token'
-        HF_MODEL = 'deepseek-ai/DeepSeek-R1'
+        // OpenRouter for AI (DeepSeek R1)
+        OPENROUTER_API_KEY_CREDENTIALS_ID = 'openrouter-api-key'
+        AI_MODEL = 'deepseek/deepseek-r1'
 
         // Grafana
         GRAFANA_URL = 'https://ayoubcpge9.grafana.net'
@@ -645,10 +645,10 @@ except:
         stage('AI Security Policy Generation') {
             steps {
                 script {
-                    echo '🤖 Generating AI-powered security policies with DeepSeek R1...'
-                    withCredentials([string(credentialsId: HF_TOKEN_CREDENTIALS_ID, variable: 'HF_TOKEN')]) {
+                    echo '🤖 Generating AI-powered security policies with DeepSeek R1 via OpenRouter...'
+                    withCredentials([string(credentialsId: OPENROUTER_API_KEY_CREDENTIALS_ID, variable: 'OPENROUTER_API_KEY')]) {
                         sh """
-                            echo "🔬 Running DeepSeek R1 policy generation..."
+                            echo "🔬 Running DeepSeek R1 policy generation via OpenRouter..."
 
                             pip3 install --quiet requests 2>/dev/null || true
 
